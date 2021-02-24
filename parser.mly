@@ -1,7 +1,7 @@
 %{ open Ast %}
 
-%token LBRACK RBRACK LPAREN RPAREN LCURLY RCURLY SEMI COMMA PERIOD
-%token DEFINE STATIC RETURN
+%token LBRACK RBRACK LPAREN RPAREN LBRACE RBRACE SEMI COMMA PERIOD
+%token DEFINE VOID RETURN
 %token INT DOUBLE ASSIGN
 %token FOR WHILE CONTINUE BREAK
 %token IF ELSE 
@@ -14,9 +14,7 @@
 
 %token <int> LITERAL
 %token <float> DOUBLE_LITERAL
-%token <string> VARIABLE
-%token <int list> INT_MATRIX
-%token <float list> DUB_MATRIX
+%token <string> STRING_LITERAL VARIABLE
 
 %nonassoc ELSE NOELSE COLON
 %left SEQUENCE
@@ -27,18 +25,52 @@
 %left GREAT LESS GEQ LEQ 
 %left PLUS MINUS
 %left TIMES DIVIDE
+%right NOT NEG
 %left PERIOD
 %left POWER
 
-%start expr
-%type <Ast.expr> expr
+%start program
+%type <Ast.program> program
 
 %%
+
+program: decls EOF    { $1 }
+
+decls: /* nothing */  { [], [] }
+  | decls vdecl       { ($2 :: fst $1), snd $1 }
+  | decls fdecl       { fst $1, ($2 :: snd $1) }
+
+fdecl:
+  typ VARIABLE LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
+    { { typ = $1; fname = $2; formals = $4;
+        locals = List.rev $7; body = List.rev $8 } }
+
+formals_opt: /* nothing */ { [] }
+          | formal_list    { List.rev $1}
+
+formal_list: typ VARIABLE                  { [($1,$2)] }
+          | formal_list COMMA typ VARIABLE { ($3,$4) :: $1 }
+
+typ: INT    { Int }
+  |  BOOL   { Bool }
+  |  VOID   { Void }
+  |  STRING { String }
+  |  DOUBLE { Double }
+  |  MATRIX { Matrix }
+
+vdecl_list: /* nothing */    { [] }
+          | vdecl_list vdecl { $2::$1 }
+
+vdecl: typ VARIABLE SEMI { ($1, $2) }
+
+
+
+
 
 stmt_list:
   /* empty */   { [] }
   | stmt_list stmt { $2 :: $1 }
-  
+
 stmt:
     expr SEMI                                 { Expr $1               }
   | BREAK SEMI                                { Break Noexpr          }
@@ -58,25 +90,41 @@ expr_opt:
   | expr      { $1      }
 
 expr:
-  expr PLUS   expr { Binop($1, Add, $3) }
-| expr MINUS  expr { Binop($1, Sub, $3) }
-| expr TIMES  expr { Binop($1, Mul, $3) }
-| expr DIVIDE expr { Binop($1, Div, $3) }
-| expr POWER expr  { Binop($1, Pow, $3) }
-| VARIABLE EQUALS expr { Equi($1, $3) }
-| expr EQUALS expr  { Binop($1, Equals, $3) }
-| expr NOTEQ expr  { Binop($1, Noteq, $3) }
-| expr LESS expr  { Binop($1, Less, $3) }
-| expr GREAT expr  { Binop($1, Great, $3) }
-| expr LEQ expr   { Binop($1, Leq, $3) }
-| expr GEQ expr     { Binop($1, Geq, $3)}
-| expr AND expr  { Binop($1, And, $3) }
-| expr OR expr  { Binop($1, Or, $3) }
-| expr LESS expr  { Binop($1, Less, $3) }
-| expr SEQUENCE expr { Seq($1, $3) } 
-| expr COLON expr   { Range($1, $3)}
-| TRUE              {Bool(true)}
-| FALSE             {Bool(false)}
-| VARIABLE         { Var($1) }
-| DOUBLE           { Dub($1)}
-| LITERAL          { Lit($1) }
+    expr PLUS   expr { Binop($1, Add, $3) }
+  | expr MINUS  expr { Binop($1, Sub, $3) }
+  | expr TIMES  expr { Binop($1, Mul, $3) }
+  | expr DIVIDE expr { Binop($1, Div, $3) }
+  | expr POWER expr  { Binop($1, Pow, $3) }
+  | expr EQUALS expr { Binop($1, Equals, $3) }
+  | expr NOTEQ expr  { Binop($1, Noteq, $3) }
+  | expr LESS expr   { Binop($1, Less, $3) }
+  | expr GREAT expr  { Binop($1, Greater, $3) }
+  | expr LEQ expr    { Binop($1, Leq, $3) }
+  | expr GEQ expr    { Binop($1, Geq, $3)}
+  | expr AND expr    { Binop($1, And, $3) }
+  | expr OR expr     { Binop($1, Or, $3) }
+  | expr LESS expr   { Binop($1, Less, $3) }
+  | expr SEQUENCE expr { Seq($1, $3) } 
+  | expr COLON expr    { Range($1, $3)}
+  | VARIABLE ASSIGN expr { Equi($1, $3) }
+  | MINUS expr %prec NEG { Unop(Neg, $2) }
+  | NOT expr             { Unop(Not, $2)}
+  | VARIABLE LPAREN actuals_opt RPAREN { Call($1, $3) } 
+  | TRUE              { Bool(true) }
+  | FALSE             { Bool(false) }
+  | VARIABLE          { Var($1) }
+  | DOUBLE            { Dub($1)}
+  | LITERAL           { Lit($1) }
+  | LPAREN expr RPAREN { $2 }
+
+expr_opt:
+  /* nothing */ { Noexpr }
+  | expr        { $1 }
+
+actuals_opt: 
+  /* nothing */  { [] }
+  | actuals_list { List.rev $1 }
+
+actuals_list: 
+    expr { [$1] }
+  | actuals_list COMMA expr {$3 :: $1 }
