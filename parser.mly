@@ -1,13 +1,15 @@
 %{ open Ast %}
 
-%token LBRACK RBRACK LPAREN RPAREN LBRACE RBRACE SEMI COMMA PERIOD
+%token LPAREN RPAREN LBRACE RBRACE 
+// %token LBRACK RBRACK PERIOD
+%token SEMI COMMA COLON
 %token DEF VOID RETURN
-%token INT DOUBLE ASSIGN
-%token FOR WHILE CONTINUE BREAK
+%token INT DOUBLE BOOL ASSIGN ABS STRING
+%token FOR WHILE BREAK CONTINUE 
 %token IF ELSE 
 %token GEQ GREAT LESS LEQ EQUALS NOTEQ OR AND NOT 
 %token PLUS MINUS TIMES DIVIDE POWER 
-%token INTMATRIX DUBMATRIX 
+%token MATRIX MAP
 %token TRUE FALSE
 %token EOF
 
@@ -16,8 +18,9 @@
 %token <float> DOUBLE_LITERAL
 %token <string> STRING_LITERAL VARIABLE
 
-%nonassoc ELSE NOELSE COLON
-%left SEQUENCE
+%nonassoc NOELSE
+%nonassoc ELSE 
+%nonassoc COLON
 %right ASSIGN
 %left OR
 %left AND
@@ -26,7 +29,7 @@
 %left PLUS MINUS
 %left TIMES DIVIDE
 %right NOT NEG
-%left PERIOD
+// %left PERIOD
 %left POWER
 
 %start program
@@ -34,7 +37,8 @@
 
 %%
 
-program: decls EOF    { $1 }
+program: 
+  decls EOF    { $1 }
 
 decls: /* nothing */  { [], [] }
   | decls vdecl       { ($2 :: fst $1), snd $1 }
@@ -42,18 +46,19 @@ decls: /* nothing */  { [], [] }
 
 fdecl:
   DEF typ VARIABLE LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
-    { { typ = $1; fname = $2; formals = $4;
-        locals = List.rev $7; body = List.rev $8 } }
+    { { typ = $2; fname = $3; formals = $5;
+        locals = List.rev $8; body = List.rev $9 } }
 
-formals_opt: /* nothing */ { [] }
-          | formal_list    { List.rev $1}
+formals_opt:
+    /* nothing */ { [] }
+  | formal_list    { List.rev $1}
 
 formal_list: typ VARIABLE                  { [($1,$2)] }
           | formal_list COMMA typ VARIABLE { ($3,$4) :: $1 }
 
 typ: INT    { Int }
   |  BOOL   { Bool }
-  |  VOID   { Void }
+  |  VOID   { Void } 
   |  STRING { String }
   |  DOUBLE { Double }
   |  MATRIX { Matrix }
@@ -72,15 +77,19 @@ stmt:
     expr SEMI                                 { Expr $1               }
   | BREAK SEMI                                { Break Noexpr          }
   | CONTINUE SEMI                             { Continue Noexpr       }
-  | RETURN SEMI                               { Return Noexpr         }
   | RETURN expr_opt SEMI                      { Return $2             }
   | LBRACE stmt_list RBRACE                   { Block(List.rev $2)    }
   | IF LPAREN expr RPAREN stmt %prec NOELSE   { If($3, $5, Block([])) }
-  | IF LPAREN stmt_list RBRACE stmt ELSE stmt { If($3, $5, $7)        }
+  | IF LPAREN expr RPAREN stmt ELSE stmt      { If($3, $5, $7)        }
   | MAP LPAREN expr COMMA expr RPAREN         { Map($3, $5)           }
   | FOR LPAREN expr SEMI expr SEMI expr RPAREN stmt 
                                               { For($3, $5, $7, $9)   }
   | WHILE LPAREN expr RPAREN stmt             { While($3, $5)         }
+
+
+expr_opt:
+  /* nothing */ { Noexpr }
+  | expr        { $1 }
 
 expr:
     expr PLUS   expr { Binop($1, Add, $3) }
@@ -96,7 +105,6 @@ expr:
   | expr GEQ expr    { Binop($1, Geq, $3)}
   | expr AND expr    { Binop($1, And, $3) }
   | expr OR expr     { Binop($1, Or, $3) }
-  | expr LESS expr   { Binop($1, Less, $3) }
   | expr COLON expr    { Range($1, $3)}
   | VARIABLE ASSIGN expr { Equi($1, $3) }
   | MINUS expr %prec NEG { Unop(Neg, $2) }
@@ -106,13 +114,10 @@ expr:
   | TRUE              { Bool(true) }
   | FALSE             { Bool(false) }
   | VARIABLE          { Var($1) }
-  | DOUBLE            { Dub($1)}
+  | DOUBLE_LITERAL    { Dub($1)}
+  | STRING_LITERAL    { Str($1)}
   | LITERAL           { Lit($1) }
   | LPAREN expr RPAREN { $2 }
-
-expr_opt:
-  /* empty */ { Noexpr }
-  | expr        { $1 }
 
 actuals_opt: 
   /* empty */  { [] }
