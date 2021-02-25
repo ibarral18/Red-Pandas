@@ -82,10 +82,6 @@ stmt:
                                               { For($3, $5, $7, $9)   }
   | WHILE LPAREN expr RPAREN stmt             { While($3, $5)         }
 
-expr_opt:
-  /* empty */ { Noexpr  }
-  | expr      { $1      }
-
 expr:
     expr PLUS   expr { Binop($1, Add, $3) }
   | expr MINUS  expr { Binop($1, Sub, $3) }
@@ -115,11 +111,11 @@ expr:
   | LPAREN expr RPAREN { $2 }
 
 expr_opt:
-  /* nothing */ { Noexpr }
+  /* empty */ { Noexpr }
   | expr        { $1 }
 
 actuals_opt: 
-  /* nothing */  { [] }
+  /* empty */  { [] }
   | actuals_list { List.rev $1 }
 
 actuals_list: 
