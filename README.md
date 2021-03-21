@@ -12,13 +12,13 @@ currently just microC with our def function syntax
 
 ```
 //building
-ocamlbuild -use-ocamlfind -pkgs llvm,llvm analysis -cflags -w,+a-4 microc.native
+make redpandas.native
 
 //compiling test case
-./redpandas.native tests/test-gcd.mc > test-gcd.ll
-llc -relocation-model=pic test-gcd.ll > test-gcd.s
-cc -o test-gcd.exe test-gcd.s printbig.o
-./test-gcd.exe
+./redpandas.native hello_world_2.mc > hello_world_2.ll
+llc -relocation-model=pic hello_world_2.ll > hello_world_2.s
+cc -o hello_world_2.exe hello_world_2.s printbig.o
+./hello_world_2.exe
 
 // or you can just do the printing thing after building
 ./redpandas.native -a tests/test-gcd.mc

@@ -1,11 +1,12 @@
 /* Hello World on Steroids */
 
 def void printSquares(int x) {
-	int s = x * x;
-	print(x + “ squared is “ + s);
+	int s;
+	s = x * x;
+	print(s);
 }
 
-void main() {
+def void main() {
 	printSquares(3);
 }
 
