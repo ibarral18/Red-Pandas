@@ -1,0 +1,4 @@
+1c1
+< ./testall.sh: 1: eval: ./microc.native: not found
+---
+> Fatal error: exception Failure("illegal binary operator float && float in -3.5 && 2.5")
