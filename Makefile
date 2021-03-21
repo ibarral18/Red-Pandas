@@ -26,11 +26,6 @@ redpandas.native :
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff *.err *.ll
-
-.PHONY : mclean
-clean :
-	ocamlbuild -mclean
 	rm -rf testall.log ocamlllvm *.diff *.err *.ll *.s *.exe
 
 # Testing the "printbig" example

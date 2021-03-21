@@ -8,4 +8,5 @@ def void main() {
 	b = 2;
 	c = a + b;
 	print(c);
+	printStr("Hello World");
 }
