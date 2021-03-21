@@ -1,8 +1,7 @@
-Just added my parser from HW1
+currently just microC with our def function syntax
 
-#TO-DO
+## TO-DO
 
-- Parser
-- Scanner
-- Adding more tokens
-- Testing that collaborators have access to open and edit other files.
+- add strings and matrices
+- add more math functions 
+- fix variable declaration to be prettier
