@@ -1,66 +1,57 @@
+(* Ocamllex scanner for MicroC *)
+
 { open Parser }
 
-rule tokenize = parse
-(*whitespace*)
-  [' ' '\t' '\r' '\n'] { tokenize lexbuf }
-(*comments*)
-| "/*" { comment lexbuf }
-| "//" { line_comment lexbuf}
-(*operators*)
-| '+'  { PLUS }
-| '-'  { MINUS }
-| '*'  { TIMES }
-| '/'  { DIVIDE }
-| '='  { ASSIGN }
-| '^'  { POWER }
-| '|'  { ABS }
-(*logic*)
-| "==" { EQUALS }
-| "!=" { NOTEQ }
-| '<'  { LESS }
-| "<=" { LEQ }
-| '>'  { GREAT }
-| ">=" { GEQ }
-| "&&" { AND }
-| '!'  { NOT }
-(*flow*)
-| "if"       { IF }
-| "else"     { ELSE }
-| "for"      { FOR }
-| "while"    { WHILE }
-| "return"   { RETURN }
-| "break"    { BREAK }
-| "def"      { DEF}
-| "continue" { CONTINUE }
-(*types*)
-| "int"    { INT }
-| "bool"   { BOOL }
-| "void"   { VOID }
-| "matrix" { MATRIX }
-| "true"   { TRUE }
-| "false"  { FALSE }
-(*organization*)
-| '['      { LBRACK }
-| ']'      { RBRACK }
+let digit = ['0' - '9']
+let digits = digit+
+
+rule token = parse
+  [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
+| "/*"     { comment lexbuf }           (* Comments *)
+| "//"     { line_comment lexbuf}
 | '('      { LPAREN }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
-| ':'      { COLON }
 | ';'      { SEMI }
 | ','      { COMMA }
-(*literals*)
-| ['0'-'9']+ as lit { LITERAL(int_of_string lit) }
-| (['0'-'9']*)'.'(['0'-'9']+) as dub { DOUBLE_LITERAL(float_of_string dub) }
-| (['0'-'9']*)'.'(['0'-'9']*) as dub { DOUBLE_LITERAL(float_of_string dub) }
-| '"' ([^ '"']* as str ) '"' { STRING_LITERAL(str) }
-| ['a'-'z' 'A'-'Z' '_'] ['0'-'9' 'a'-'z' 'A'-'Z' '_']* as var { VARIABLE(var) }
+| '+'      { PLUS }
+| '-'      { MINUS }
+| '*'      { TIMES }
+| '/'      { DIVIDE }
+| '='      { ASSIGN }
+| "=="     { EQ }
+| "!="     { NEQ }
+| '<'      { LT }
+| "<="     { LEQ }
+| ">"      { GT }
+| ">="     { GEQ }
+| "&&"     { AND }
+| "||"     { OR }
+| "!"      { NOT }
+| "if"     { IF }
+| "else"   { ELSE }
+| "for"    { FOR }
+| "while"  { WHILE }
+| "return" { RETURN }
+| "int"    { INT }
+| "bool"   { BOOL }
+| "float"  { FLOAT }
+| "void"   { VOID }
+| "String" { STRING }
+| "true"   { BLIT(true)  }
+| "false"  { BLIT(false) }
+| "def"    { DEF }
+| digits as lxm { LITERAL(int_of_string lxm) }
+| digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
+| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) }
+| '"' (([^ '"'] | "\\\"")* as lxm) '"' { STRLIT(lxm) }
 | eof { EOF }
-| _ as char { raise (Failure("illegal character " ^ Char.escaped car ))}
+| _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
 and comment = parse
   "*/" { token lexbuf }
-  | _  { comment lexbuf }
+| _    { comment lexbuf }
 
 and line_comment = parse
   "\n" { token lexbuf }
