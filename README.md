@@ -1,12 +1,11 @@
-WORKING IN THE "HELLO" BRANCH
-currently just microC with our def function syntax
+
 
 ## TO-DO
-
-- add strings and matrices
+- add matrices
 - add more math functions
 - fix variable declaration to be prettier
 - add "def" to test cases
+- fix file extensions
 
 ## To build and run hello world
 
