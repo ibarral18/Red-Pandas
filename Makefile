@@ -47,15 +47,15 @@ FAILS = \
   func8 func9 global1 global2 if1 if2 if3 nomain printbig printb print \
   return1 return2 while1 while2
 
-TESTFILES = $(TESTS:%=test-%.mc) $(TESTS:%=test-%.out) \
-	    $(FAILS:%=fail-%.mc) $(FAILS:%=fail-%.err)
+TESTFILES = $(TESTS:%=test-%.rp) $(TESTS:%=test-%.out) \
+	    $(FAILS:%=fail-%.rp) $(FAILS:%=fail-%.err)
 
-TARFILES = ast.ml sast.ml codegen.ml Makefile _tags redpandas.ml redpandasparse.mly \
-	README scanner.mll semant.ml testall.sh \
+TARFILES = ast.ml sast.ml codegen.ml Makefile _tags redpandas.ml parser.mly \
+	README.md scanner.mll semant.ml testall.sh \
 	printbig.c arcade-font.pbm font2c \
-	Dockerfile \
+	Dockerfile hello_world.rp hello_world_2.rp \
 	$(TESTFILES:%=tests/%) 
 
 redpandas.tar.gz : $(TARFILES)
-	cd .. && tar czf redpandas/redpandas.tar.gz \
-		$(TARFILES:%=redpandas/%)
+	cd .. && tar czf Red-Pandas/redpandas.tar.gz \
+		$(TARFILES:%=Red-Pandas/%)
