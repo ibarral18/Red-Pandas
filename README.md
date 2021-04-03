@@ -4,6 +4,7 @@ Amina Assal, Ivan Barral, Rafail Khalilov, and Myric Lehner
 ## TO-DO
 - Update variable declarations to our own style of in-line variable and assignment.
 - add matrices
+  -> add indexing 
 - add more math functions
 - fix variable declaration to be prettier
 - add "def" to test cases
