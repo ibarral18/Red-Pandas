@@ -58,13 +58,13 @@ formal_list:
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 typ:
-    INT   { Int   }
-  | BOOL  { Bool  }
-  | FLOAT { Float }
-  | VOID  { Void  }
-  | STRING { String }
-  | MATRIX INT { Matrix }
-
+    INT        { Int           }
+  | BOOL       { Bool          }
+  | FLOAT      { Float         }
+  | VOID       { Void          }
+  | STRING     { String        }
+  | MATRIX INT { Matrix Int    }
+  | MATRIX FLOAT { Matrix Float }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -114,16 +114,20 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN        { $2            }
-  | LBRACK arr_opt RBRACK     { Mat($2)       }
+  | LBRACK mat_opt RBRACK     { Mat($2)       }
 
-arr_opt:
+mat_opt:
     /* nothing */ { [] }
-  | arr_list    { List.rev $1 }
+  | row_list    { List.rev $1 }
 
-arr_list:
-    expr                    { [$1]     }
-  | arr_list COMMA arr_list { $3, $1   }
-  | arr_list COMMA expr     { $3 :: $1 }
+row_list:
+    /* nothing */            { [] }
+  | row_list COMMA row_expr  { $3 :: List.rev $1 }
+
+row_expr:
+    expr                     { [$1] }
+  | row_expr COMMA expr      { $3 :: $1 }
+
 
 args_opt:
     /* nothing */ { [] }
