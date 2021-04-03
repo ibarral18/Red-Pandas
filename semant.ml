@@ -146,6 +146,13 @@ let check (globals, functions) =
           in 
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
+      
+      | Mat(arr) as mat ->
+          let arr_length = List.length arr 
+    
+    
+    
+    
     in
 
     let check_bool_expr e = 

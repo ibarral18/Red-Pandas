@@ -5,10 +5,11 @@ open Ast
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA 
+%token LBRACK RBRACK PERIOD
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE 
-%token STRING INT BOOL FLOAT VOID
+%token STRING MATRIX INT BOOL FLOAT VOID
 %token DEF
 %token <int> LITERAL
 %token <bool> BLIT
@@ -62,6 +63,8 @@ typ:
   | FLOAT { Float }
   | VOID  { Void  }
   | STRING { String }
+  | MATRIX INT { Matrix }
+
 
 vdecl_list:
     /* nothing */    { [] }
@@ -110,7 +113,17 @@ expr:
   | NOT expr         { Unop(Not, $2)          }
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
-  | LPAREN expr RPAREN { $2                   }
+  | LPAREN expr RPAREN        { $2            }
+  | LBRACK arr_opt RBRACK     { Mat($2)       }
+
+arr_opt:
+    /* nothing */ { [] }
+  | arr_list    { List.rev $1 }
+
+arr_list:
+    expr                    { [$1]     }
+  | arr_list COMMA arr_list { $3, $1   }
+  | arr_list COMMA expr     { $3 :: $1 }
 
 args_opt:
     /* nothing */ { [] }

@@ -1,4 +1,4 @@
-(* Ocamllex scanner for MicroC *)
+(* Ocamllex scanner for Red-Pandas *)
 
 { open Parser }
 
@@ -13,6 +13,8 @@ rule token = parse
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
+| '['      { LBRACK }
+| ']'      { RBRACK }
 | ';'      { SEMI }
 | ','      { COMMA }
 | '+'      { PLUS }
@@ -39,6 +41,7 @@ rule token = parse
 | "float"  { FLOAT }
 | "void"   { VOID }
 | "String" { STRING }
+| "matrix" { MATRIX }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
 | "def"    { DEF }

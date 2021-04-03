@@ -5,7 +5,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | Void | String
+type typ = Int | Bool | Float | Void | String | Matrix
 
 type bind = typ * string
 
@@ -20,6 +20,7 @@ type expr =
   | Assign of string * expr
   | Call of string * expr list
   | Noexpr
+  | Mat of expr list
 
 type stmt =
     Block of stmt list
@@ -73,6 +74,7 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
+  | Mat(a) -> List.map string_of_expr a
 
 let rec string_of_stmt = function
     Block(stmts) ->
@@ -93,6 +95,7 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "String"
+  | Matrix -> "Matrix Int"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
