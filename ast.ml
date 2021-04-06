@@ -11,8 +11,8 @@ type typ =
   | Bool
   | Float
   | String 
-  | Matrix Int of ((int array) array)
-  | Matrix Float of ((string array) array)
+  | Matrix_Int of ((int array) array)
+  | Matrix_Float of ((string array) array)
 
 type bind = typ * string
 

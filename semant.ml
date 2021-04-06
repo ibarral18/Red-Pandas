@@ -159,7 +159,7 @@ let check (globals, functions) =
               | _ -> raise (Failure("Matrix types don't match")) 
             in
             if (List.for_all (fun j -> List.for_all (fun k -> expr_check (expr k)) j) arr) then
-              (if (wt = Int) then (Matrix Int, SMat arr) else (Matrix Float, SMat arr))
+              (if (wt = Int) then (Matrix_Int, SMat arr) else (Matrix_Float, SMat arr))
             
     in
 
