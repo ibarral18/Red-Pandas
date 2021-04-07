@@ -5,7 +5,7 @@ open Ast
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA 
-%token LBRACK RBRACK PERIOD
+%token LBRACK RBRACK (* PERIOD *)
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE 
@@ -118,14 +118,15 @@ expr:
 
 mat_opt:
     /* nothing */ { [] }
-  | row_list    { List.rev $1 }
+  | row_list      { List.rev $1 }
 
 row_list:
-    /* nothing */            { [] }
-  | row_list COMMA row_expr  { $3 :: List.rev $1 }
+    LBRACK row_expr RBRACK                { List.rev $ 2        }
+  | row_list COMMA LBRACK row_expr RBRACK { (List.rev $3) :: $1 }
 
 row_expr:
-    expr                     { [$1] }
+    /* nothing */            { []       }
+  | expr                     { [$1]    }
   | row_expr COMMA expr      { $3 :: $1 }
 
 
