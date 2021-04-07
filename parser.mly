@@ -63,8 +63,8 @@ typ:
   | FLOAT      { Float         }
   | VOID       { Void          }
   | STRING     { String        }
-  | MATRIX INT { Matrix_Int    }
-  | MATRIX FLOAT { Matrix_Float }
+  | MATRIX     { Matrix_Int    }
+  | FMATRIX    { Matrix_Float  }
 
 vdecl_list:
     /* nothing */    { [] }
