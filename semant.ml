@@ -149,13 +149,13 @@ let check (globals, functions) =
       
       | Mat(arr) as mat ->
           let row_lengths = List.map List.length arr in 
-          if !(List.for_all (fun l -> if List.hd(row_lengths) = l then true else false) row_lengths) then
+          if not (List.for_all (fun l -> if List.hd(row_lengths) = l then true else false) row_lengths) then
             raise (Failure ("Matrix rows must be of same length"))
           else 
-            let (wt, w') = expr List.hd(List.hd(arr)) in
+            let (wt, w') = expr (List.hd(List.hd(arr))) in
             let expr_check = function 
-                (Int, _) -> if wt = Int then true 
-              | (Float, _) -> if wt = Float then true
+                (Int, _) -> (if wt = Int then true) 
+              | (Float, _) -> (if wt = Float then true)
               | _ -> raise (Failure("Matrix types don't match")) 
             in
             if (List.for_all (fun j -> List.for_all (fun k -> expr_check (expr k)) j) arr) then
