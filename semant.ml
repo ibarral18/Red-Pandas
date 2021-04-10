@@ -154,8 +154,8 @@ let check (globals, functions) =
           else 
             let (wt, w') = expr (List.hd(List.hd(arr))) in
             let expr_check = function 
-                (Int, _) -> (if wt = Int then true) 
-              | (Float, _) -> (if wt = Float then true)
+                (Int, _) when wt = Int -> true 
+              | (Float, _) when wt = Float -> true
               | _ -> raise (Failure("Matrix types don't match")) 
             in
             if (List.for_all (fun j -> List.for_all (fun k -> expr_check (expr k)) j) arr) then
