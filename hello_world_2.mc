@@ -1,8 +1,7 @@
 /* Hello World on Steroids */
 
 def void printSquares(int x) {
-	int s;
-	s = x * x;
+	int s = x * x;
 	printStr("Square of x is: ");
 	print(s);
 }

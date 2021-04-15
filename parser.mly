@@ -9,7 +9,7 @@ open Ast
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE 
-%token STRING MATRIX FMATRIX INT BOOL FLOAT VOID
+%token STRING MATRIX INT BOOL FLOAT VOID
 %token DEF
 %token <int> LITERAL
 %token <bool> BLIT
@@ -54,8 +54,8 @@ formals_opt:
   | formal_list   { $1 }
 
 formal_list:
-    typ ID                   { [($1,$2)]     }
-  | formal_list COMMA typ ID { ($3,$4) :: $1 }
+    typ ID                   { [($1,$2, Noexpr )]     }
+  | formal_list COMMA typ ID { ($3,$4, Noexpr) :: $1 }
 
 typ:
     INT        { Int           }
@@ -63,15 +63,15 @@ typ:
   | FLOAT      { Float         }
   | VOID       { Void          }
   | STRING     { String        }
-  | MATRIX     { Matrix_Int    }
-  | FMATRIX    { Matrix_Float  }
+  | MATRIX typ { Matrix($2)    }
 
 vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
-   typ ID SEMI { ($1, $2) }
+   typ ID SEMI { ($1, $2, Noexpr) }
+  | typ ID ASSIGN expr SEMI { ($1, $2, Assign($2,$4))}
 
 stmt_list:
     /* nothing */  { [] }
@@ -121,7 +121,7 @@ mat_opt:
   | row_list      { List.rev $1 }
 
 row_list:
-    LBRACK row_expr RBRACK                { List.rev $2        }
+    LBRACK row_expr RBRACK                { [(List.rev $2)]        }
   | row_list COMMA LBRACK row_expr RBRACK { (List.rev $4) :: $1 }
 
 row_expr:

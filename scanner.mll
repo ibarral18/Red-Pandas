@@ -42,7 +42,6 @@ rule token = parse
 | "void"   { VOID }
 | "String" { STRING }
 | "matrix" { MATRIX }
-| "fmatrix" { FMATRIX }
 | "true"    { BLIT(true)  }
 | "false"   { BLIT(false) }
 | "def"     { DEF }

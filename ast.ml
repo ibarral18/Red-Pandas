@@ -11,10 +11,7 @@ type typ =
   | Bool
   | Float
   | String 
-  | Matrix_Int of ((int array) array)
-  | Matrix_Float of ((string array) array)
-
-type bind = typ * string
+  | Matrix of typ
 
 type expr =
     Literal of int
@@ -27,7 +24,11 @@ type expr =
   | Assign of string * expr
   | Call of string * expr list
   | Noexpr
-  | Mat of (expr list) list 
+  | Mat of expr list list 
+
+type bind = typ * string * expr
+
+
 
 type stmt =
     Block of stmt list
@@ -73,6 +74,7 @@ let rec string_of_expr = function
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | StrLit(l) -> "\"" ^ (String.escaped l) ^ "\""
+  | Mat(l) -> "matLit"
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
@@ -101,12 +103,13 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "String"
+  | Matrix(t) -> "matrix "
 
-let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
+let string_of_vdecl (t, id, _) = string_of_typ t ^ " " ^ id ^ ";\n"
 
 let string_of_fdecl fdecl =
   "def" ^ " " ^ string_of_typ fdecl.typ ^ " " ^
-  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
+  fdecl.fname ^ "(" ^ String.concat ", " (List.map (fun (_, var, _) -> var) fdecl.formals) ^
   ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.locals) ^
   String.concat "" (List.map string_of_stmt fdecl.body) ^
