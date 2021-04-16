@@ -103,7 +103,7 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "String"
-  | Matrix(t) -> "matrix "
+  | Matrix(t) -> "matrix"
 
 let string_of_vdecl (t, id, _) = string_of_typ t ^ " " ^ id ^ ";\n"
 

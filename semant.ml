@@ -161,7 +161,7 @@ let check (globals, functions) =
               | _ -> raise (Failure("Matrix types don't match")) 
             in
             ignore(List.for_all (fun j -> List.for_all (fun k -> expr_check (expr k)) j) arr);
-            (Matrix Int, SMat(sArr))
+            (Matrix wt, SMat(sArr))
             
     in
 
