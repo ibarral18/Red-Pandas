@@ -13,8 +13,11 @@ and sx =
   | SUnop of uop * sexpr
   | SAssign of string * sexpr
   | SCall of string * sexpr list
-  | SNoexpr
   | SMat of typ * sexpr list list 
+  | SCol of int
+  | SRow of int
+  | SNoexpr
+  
 
 type sstmt =
     SBlock of sstmt list
@@ -45,6 +48,8 @@ let rec string_of_sexpr (t, e) =
   | SFliteral(l) -> l
   | SMat(l,s) -> "matLit"
   | SId(s) -> s
+  | SCol(s) -> (string_of_int s) ^ " columns"
+  | SRow(s) -> (string_of_int s) ^ " rows"
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e

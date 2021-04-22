@@ -148,7 +148,7 @@ let check (globals, functions) =
           let args' = List.map2 check_call formals args
           in (fd.typ, SCall(fname, args'))
       
-      | Mat(arr) as mat ->
+      | Mat(arr) ->
         let sArr = (List.map (fun l -> (List.map expr l)) arr) in
           let row_lengths = List.map List.length arr in 
           if not (List.for_all (fun l -> if List.hd(row_lengths) = l then true else false) row_lengths) then
@@ -164,6 +164,20 @@ let check (globals, functions) =
             in
             ignore(List.for_all (fun j -> List.for_all (fun k -> expr_check (expr k)) j) arr);
             (Matrix (wt, r, c), SMat(wt, sArr))
+      | Col(s)     -> 
+          (match type_of_identifier s with
+            Matrix(_,_,c) -> 
+              (match c with c -> (Int, SCol(c))
+              | _ -> raise(Failure "Add int column value to matrix decl"))
+            |_ -> raise(Failure "Cannot find column value of non-matrix"))
+      | Row(s)     -> 
+          (match type_of_identifier s with
+            Matrix(_,r,_) -> 
+              (match r with r -> (Int, SRow(r))
+              | _ -> raise(Failure "Add int column value to matrix decl"))
+            |_ -> raise(Failure "Cannot find column value of non-matrix"))
+
+
             
     in
 

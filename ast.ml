@@ -17,8 +17,11 @@ type expr =
   | Unop of uop * expr
   | Assign of string * expr
   | Call of string * expr list
-  | Noexpr
   | Mat of expr list list 
+  | Col of string
+  | Row of string
+  | Noexpr
+  
 
 type typ = 
     Void 
@@ -82,6 +85,8 @@ let rec string_of_expr = function
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | Col(s) -> (s) ^ ".col"
+  | Row(s) -> (s) ^ ".row"
   | Noexpr -> ""
 
 let rec string_of_stmt = function

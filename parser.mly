@@ -20,11 +20,12 @@ let parse_error s =
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA 
-%token LBRACK RBRACK 
+%token LBRACK RBRACK PERIOD
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE 
 %token STRING MATRIX INT BOOL FLOAT VOID
+%token COL ROW
 %token DEF
 %token <int> LITERAL
 %token <bool> BLIT
@@ -129,14 +130,16 @@ expr:
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN        { $2            }
   | LBRACK mat_opt RBRACK     { Mat($2)       }
+  | ID PERIOD COL             { Col($1)       }
+  | ID PERIOD ROW             { Row($1)       }
 
 mat_opt:
     /* nothing */ { [] }
   | row_list      { List.rev $1 }
 
 row_list:
-    LBRACK row_expr RBRACK                { [$2]        }
-  | row_list COMMA LBRACK row_expr RBRACK {  $4 :: $1 }
+    LBRACK row_expr RBRACK                { [(List.rev $2)]        }
+  | row_list COMMA LBRACK row_expr RBRACK {  (List.rev $4) :: $1 }
 
 row_expr:
     /* nothing */            { []       }

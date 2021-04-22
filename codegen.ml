@@ -129,16 +129,18 @@ let translate (globals, functions) =
       | SStrLit s   -> L.build_global_stringptr s "tmp" builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
-      | SMat (t, smlist) -> let numtype = match t with A.Float -> float_t
-                                | A.Int -> i32_t
-                                | _ -> i32_t
+      | SMat (t, smlist) -> 
+        let innertype = match t with 
+                A.Float -> float_t
+                | A.Int -> i32_t
+                | _ -> i32_t
           in
-            let flipped     = List.map List.rev smlist in
-            let lists       = List.map (List.map (expr builder)) flipped in
-            let listArray   = List.map Array.of_list lists in
-            let listArray2  = List.rev (List.map (L.const_array numtype) listArray) in
-            let arrayArray  = Array.of_list listArray2 in
-            L.const_array (array_t numtype (List.length (List.hd smlist))) arrayArray
+            let lists       = List.map (List.map (expr builder)) smlist in
+            let innerArray   = List.map Array.of_list lists in
+            let list2array  = Array.of_list (List.rev (List.map (L.const_array innertype) innerArray)) in
+            L.const_array (array_t innertype (List.length (List.hd smlist))) list2array
+      | SCol(c)   -> L.const_int i32_t c
+      | SRow(r)   -> L.const_int i32_t r
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop ((A.Float,_ ) as e1, op, e2) ->

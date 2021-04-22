@@ -2,11 +2,18 @@
 
 def void printSquares(int x) {
 	int s; 
-	matrix int [2][2] t;
+	int i;
+	matrix int [2][5] t;
 	s = x * x;
-	t = [[1,2],[2,2,3]];
+	t = [[1,2,3,4,5],[2,2,3,4,5]];
+	t.row;
 	printStr("Square of x is: ");
 	print(s);
+	print(t.row);
+	for(i=1;i<=t.col;i = i + 1){
+		print(i);
+	}
+	
 }
 
 def void main() {
