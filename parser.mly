@@ -2,10 +2,25 @@
 
 %{
 open Ast
+let parse_error s =
+      begin
+        try
+          let start_pos = Parsing.symbol_start_pos ()
+          and end_pos = Parsing.symbol_end_pos () in
+          Printf.printf "File \"%s\", line %d, characters %d-%d: \n"
+            start_pos.pos_fname
+            start_pos.pos_lnum
+            (start_pos.pos_cnum - start_pos.pos_bol)
+            (end_pos.pos_cnum - start_pos.pos_bol)
+        with Invalid_argument(_) -> ()
+      end;
+      Printf.printf "Syntax error: %s\n" s;
+      raise Parsing.Parse_error
+
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA 
-%token LBRACK RBRACK /* PERIOD */
+%token LBRACK RBRACK 
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE 
@@ -54,8 +69,8 @@ formals_opt:
   | formal_list   { $1 }
 
 formal_list:
-    typ ID                   { [($1,$2, Noexpr )]     }
-  | formal_list COMMA typ ID { ($3,$4, Noexpr) :: $1 }
+    typ ID                   { [($1,$2)]     }
+  | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 typ:
     INT        { Int           }
@@ -63,15 +78,14 @@ typ:
   | FLOAT      { Float         }
   | VOID       { Void          }
   | STRING     { String        }
-  | MATRIX typ { Matrix($2)    }
+  | MATRIX typ LBRACK LITERAL RBRACK LBRACK LITERAL RBRACK   { Matrix($2, $4, $7) }
 
 vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
-   typ ID SEMI { ($1, $2, Noexpr) }
-  | typ ID ASSIGN expr SEMI { ($1, $2, Assign($2,$4))}
+   typ ID SEMI { ($1, $2) }
 
 stmt_list:
     /* nothing */  { [] }
@@ -121,8 +135,8 @@ mat_opt:
   | row_list      { List.rev $1 }
 
 row_list:
-    LBRACK row_expr RBRACK                { [(List.rev $2)]        }
-  | row_list COMMA LBRACK row_expr RBRACK { (List.rev $4) :: $1 }
+    LBRACK row_expr RBRACK                { [$2]        }
+  | row_list COMMA LBRACK row_expr RBRACK {  $4 :: $1 }
 
 row_expr:
     /* nothing */            { []       }

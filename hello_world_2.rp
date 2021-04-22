@@ -1,8 +1,10 @@
 /* Hello World on Steroids */
 
 def void printSquares(int x) {
-	int s;
+	int s; 
+	matrix int [2][2] t;
 	s = x * x;
+	t = [[1,2],[2,2,3]];
 	printStr("Square of x is: ");
 	print(s);
 }
