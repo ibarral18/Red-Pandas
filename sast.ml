@@ -14,7 +14,7 @@ and sx =
   | SAssign of string * sexpr
   | SCall of string * sexpr list
   | SNoexpr
-  | SMat of sexpr list list 
+  | SMat of typ * sexpr list list 
 
 type sstmt =
     SBlock of sstmt list
@@ -43,7 +43,7 @@ let rec string_of_sexpr (t, e) =
   | SBoolLit(false) -> "false"
   | SStrLit(l) -> "\"" ^ (String.escaped l) ^ "\""
   | SFliteral(l) -> l
-  | SMat(l) -> "matLit"
+  | SMat(l,s) -> "matLit"
   | SId(s) -> s
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
@@ -70,7 +70,7 @@ let rec string_of_sstmt = function
 
 let string_of_sfdecl fdecl =
   string_of_typ fdecl.styp ^ " " ^
-  fdecl.sfname ^ "(" ^ String.concat ", " (List.map (fun (_,var,_) -> var) fdecl.sformals) ^
+  fdecl.sfname ^ "(" ^ String.concat ", " (List.map snd fdecl.sformals) ^
   ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.slocals) ^
   String.concat "" (List.map string_of_sstmt fdecl.sbody) ^

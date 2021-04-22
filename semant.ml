@@ -15,14 +15,14 @@ let check (globals, functions) =
   (* Verify a list of bindings has no void types or duplicate names *)
   let check_binds (kind : string) (binds : bind list) =
     List.iter (function
-	(Void, b, _) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
+	(Void, b) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
       | _ -> ()) binds;
     let rec dups = function
         [] -> ()
-      |	((_,n1,_) :: (_,n2,_) :: _) when n1 = n2 ->
+      |	((_,n1) :: (_,n2) :: _) when n1 = n2 ->
 	  raise (Failure ("duplicate " ^ kind ^ " " ^ n1))
       | _ :: t -> dups t
-    in dups (List.sort (fun (_,a,_) (_,b,_) -> compare a b) binds)
+    in dups (List.sort (fun (_,a) (_,b) -> compare a b) binds)
   in
 
   (**** Check global variables ****)
@@ -36,7 +36,7 @@ let check (globals, functions) =
     let add_bind map (name, ty) = StringMap.add name {
       typ = Void;
       fname = name; 
-      formals = [(ty, "x", Noexpr)];
+      formals = [(ty, "x")];
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
 			                         ("printb", Bool);
@@ -81,7 +81,7 @@ let check (globals, functions) =
     in   
 
     (* Build local symbol table of variables for this function *)
-    let symbols = List.fold_left (fun m (ty, name, _) -> StringMap.add name ty m)
+    let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
 	                StringMap.empty (globals @ func.formals @ func.locals )
     in
 
@@ -144,7 +144,7 @@ let check (globals, functions) =
               " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
             in (check_assign ft et err, e')
           in 
-          let formals = List.map (fun (tp, var, _) -> (tp,var)) fd.formals in
+          let formals = List.map (fun (tp, var) -> (tp,var)) fd.formals in
           let args' = List.map2 check_call formals args
           in (fd.typ, SCall(fname, args'))
       
@@ -155,13 +155,15 @@ let check (globals, functions) =
             raise (Failure ("Matrix rows must be of same length"))
           else 
             let (wt, w') = expr (List.hd(List.hd(arr))) in
+            let r = List.length arr in 
+            let c = List.length (List.hd arr) in
             let expr_check = function 
                 (Int, _) when wt = Int -> true 
               | (Float, _) when wt = Float -> true
               | _ -> raise (Failure("Matrix types don't match")) 
             in
             ignore(List.for_all (fun j -> List.for_all (fun k -> expr_check (expr k)) j) arr);
-            (Matrix wt, SMat(sArr))
+            (Matrix (wt, r, c), SMat(wt, sArr))
             
     in
 

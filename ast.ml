@@ -5,13 +5,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
 
 type uop = Neg | Not
 
-type typ = 
-    Void 
-  | Int 
-  | Bool
-  | Float
-  | String 
-  | Matrix of typ
+
 
 type expr =
     Literal of int
@@ -26,9 +20,15 @@ type expr =
   | Noexpr
   | Mat of expr list list 
 
-type bind = typ * string * expr
+type typ = 
+    Void 
+  | Int 
+  | Bool
+  | Float
+  | String 
+  | Matrix of typ * int * int
 
-
+type bind = typ * string
 
 type stmt =
     Block of stmt list
@@ -103,13 +103,13 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "String"
-  | Matrix(t) -> "matrix"
+  | Matrix(t, r, c) -> "matrix [" ^ (string_of_int r) ^ "][" ^ string_of_int c ^ "]"
 
-let string_of_vdecl (t, id, _) = string_of_typ t ^ " " ^ id ^ ";\n"
+let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
 let string_of_fdecl fdecl =
   "def" ^ " " ^ string_of_typ fdecl.typ ^ " " ^
-  fdecl.fname ^ "(" ^ String.concat ", " (List.map (fun (_, var, _) -> var) fdecl.formals) ^
+  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
   ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.locals) ^
   String.concat "" (List.map string_of_stmt fdecl.body) ^

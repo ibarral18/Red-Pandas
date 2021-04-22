@@ -33,6 +33,7 @@ let translate (globals, functions) =
   and float_t    = L.double_type context
   and void_t     = L.void_type   context
   and pointer_t  = L.pointer_type 
+  and array_t    = L.array_type
   in
 
   (* Return the LLVM type for a MicroC type *)
@@ -42,11 +43,20 @@ let translate (globals, functions) =
     | A.Float -> float_t
     | A.Void  -> void_t
     | A.String -> pointer_t i8_t
+    | A.Matrix(t,r,c) -> 
+        let rows = match r with s -> s
+          | _ -> raise(Failure"Integer required for matrix dimension") in
+        let cols = match c with s -> s
+          | _ -> raise(Failure"Integer required for matrix dimension") in
+          (match t with
+            A.Int    -> array_t (array_t i32_t cols) rows
+          | A.Float  -> array_t (array_t float_t cols) rows
+          | _        -> raise(Failure"Invalid datatype for matrix"))
   in
 
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
-    let global_var m (t, n,_) = 
+    let global_var m (t, n) = 
       let init = match t with
           A.Float -> L.const_float (ltype_of_typ t) 0.0
         | _ -> L.const_int (ltype_of_typ t) 0
@@ -69,7 +79,7 @@ let translate (globals, functions) =
     let function_decl m fdecl =
       let name = fdecl.sfname
       and formal_types = 
-	Array.of_list (List.map (fun (t,_,_) -> ltype_of_typ t) fdecl.sformals)
+	Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
       in let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
     List.fold_left function_decl StringMap.empty functions in
@@ -100,11 +110,9 @@ let translate (globals, functions) =
 	in StringMap.add n local_var m 
       in
       
-      let sformals = List.map (fun (tp, var, _) -> (tp, var)) fdecl.sformals in
-      let slocals = List.map (fun (tp, var, _) -> (tp, var)) fdecl.slocals in
-      let formals = List.fold_left2 add_formal StringMap.empty sformals
+      let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
           (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals slocals 
+      List.fold_left add_local formals fdecl.slocals 
     in
 
     (* Return the value for a variable or formal argument.
@@ -115,12 +123,22 @@ let translate (globals, functions) =
 
     (* Construct code for an expression; return its value *)
     let rec expr builder ((_, e) : sexpr) = match e with
-	SLiteral i  -> L.const_int i32_t i
+	    SLiteral i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SFliteral l -> L.const_float_of_string float_t l
       | SStrLit s   -> L.build_global_stringptr s "tmp" builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
+      | SMat (t, smlist) -> let numtype = match t with A.Float -> float_t
+                                | A.Int -> i32_t
+                                | _ -> i32_t
+          in
+            let flipped     = List.map List.rev smlist in
+            let lists       = List.map (List.map (expr builder)) flipped in
+            let listArray   = List.map Array.of_list lists in
+            let listArray2  = List.rev (List.map (L.const_array numtype) listArray) in
+            let arrayArray  = Array.of_list listArray2 in
+            L.const_array (array_t numtype (List.length (List.hd smlist))) arrayArray
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
