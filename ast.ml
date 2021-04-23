@@ -20,6 +20,7 @@ type expr =
   | Mat of expr list list 
   | Col of string
   | Row of string
+  | Access of string * expr * expr
   | Noexpr
   
 
@@ -85,8 +86,9 @@ let rec string_of_expr = function
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-  | Col(s) -> (s) ^ ".col"
-  | Row(s) -> (s) ^ ".row"
+  | Col(s) -> s ^ ".col"
+  | Row(s) -> s ^ ".row"
+  | Access(s, r, c) -> s ^ "[" ^ string_of_expr r ^ "]" ^ "[" ^ string_of_expr c ^ "]"
   | Noexpr -> ""
 
 let rec string_of_stmt = function

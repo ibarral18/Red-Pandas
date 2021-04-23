@@ -167,15 +167,30 @@ let check (globals, functions) =
       | Col(s)     -> 
           (match type_of_identifier s with
             Matrix(_,_,c) -> 
-              (match c with c -> (Int, SCol(c))
+              (match c with 
+              c -> (Int, SCol(c))
               | _ -> raise(Failure "Add int column value to matrix decl"))
             |_ -> raise(Failure "Cannot find column value of non-matrix"))
       | Row(s)     -> 
           (match type_of_identifier s with
             Matrix(_,r,_) -> 
-              (match r with r -> (Int, SRow(r))
+              (match r with 
+              r -> (Int, SRow(r))
               | _ -> raise(Failure "Add int column value to matrix decl"))
             |_ -> raise(Failure "Cannot find column value of non-matrix"))
+      | Access(s, r, c) -> let (row, row') = expr r in
+                      let(col,col') = expr c in
+                      if (col = Int)
+                        then (if(row = Int)
+                                then ()
+                                else raise(Failure "row value is non-integer");)
+                        else raise(Failure "column value is non-integer");
+                      (match type_of_identifier s with
+                      Matrix(t,a,b) -> (t, SAccess(s, (row, row'), (col,col')))
+                      | _ -> raise(Failure "Cannot perform access operation on a non-matrix type")
+                      )
+
+       
 
 
             

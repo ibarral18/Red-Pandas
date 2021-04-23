@@ -132,6 +132,9 @@ expr:
   | LBRACK mat_opt RBRACK     { Mat($2)       }
   | ID PERIOD COL             { Col($1)       }
   | ID PERIOD ROW             { Row($1)       }
+  | ID LBRACK expr RBRACK LBRACK expr RBRACK
+                      { Access($1, $3, $6)    }
+                      
 
 mat_opt:
     /* nothing */ { [] }

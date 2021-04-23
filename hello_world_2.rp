@@ -3,15 +3,19 @@
 def void printSquares(int x) {
 	int s; 
 	int i;
-	matrix int [2][5] t;
+	int j;
+	matrix int [3][5] m;
 	s = x * x;
-	t = [[1,2,3,4,5],[2,2,3,4,5]];
-	t.row;
+	m = [[1,2,3,4,5],
+	     [8,7,6,2,10],
+			 [20,10,4,9,1]];
 	printStr("Square of x is: ");
 	print(s);
-	print(t.row);
-	for(i=1;i<=t.col;i = i + 1){
-		print(i);
+	printStr("All Values of matrix:");
+	for(j = 0; j < m.row; j = j + 1 ){
+		for(i = 0; i < m.col; i = i + 1){
+			print(m[j][i]);
+		}
 	}
 	
 }

@@ -121,6 +121,11 @@ let translate (globals, functions) =
                    with Not_found -> StringMap.find n global_vars
     in
 
+    let accessValue s r c builder a = 
+      let specific = L.build_gep (lookup s) [|L.const_int i32_t 0; r; c|] s builder in
+      if a then specific else L.build_load specific s builder
+    in
+
     (* Construct code for an expression; return its value *)
     let rec expr builder ((_, e) : sexpr) = match e with
 	    SLiteral i  -> L.const_int i32_t i
@@ -129,18 +134,20 @@ let translate (globals, functions) =
       | SStrLit s   -> L.build_global_stringptr s "tmp" builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
-      | SMat (t, smlist) -> 
+      | SMat (t, mat) -> 
         let innertype = match t with 
                 A.Float -> float_t
                 | A.Int -> i32_t
                 | _ -> i32_t
           in
-            let lists       = List.map (List.map (expr builder)) smlist in
+            let lists       = List.map (List.map (expr builder)) mat in
             let innerArray   = List.map Array.of_list lists in
-            let list2array  = Array.of_list (List.rev (List.map (L.const_array innertype) innerArray)) in
-            L.const_array (array_t innertype (List.length (List.hd smlist))) list2array
-      | SCol(c)   -> L.const_int i32_t c
-      | SRow(r)   -> L.const_int i32_t r
+            let list2array  = Array.of_list ((List.map (L.const_array innertype) innerArray)) in
+            L.const_array (array_t innertype (List.length (List.hd mat))) list2array
+      | SCol (c)   -> L.const_int i32_t c
+      | SRow (r)   -> L.const_int i32_t r
+      | SAccess (s,r,c) -> let a = expr builder r and b = expr builder c in
+                          (accessValue s a b builder false)
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
