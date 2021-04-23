@@ -11,7 +11,7 @@ and sx =
   | SId of string
   | SBinop of sexpr * op * sexpr
   | SUnop of uop * sexpr
-  | SAssign of string * sexpr
+  | SAssign of sexpr * sexpr
   | SCall of string * sexpr list
   | SMat of typ * sexpr list list 
   | SCol of int
@@ -54,7 +54,7 @@ let rec string_of_sexpr (t, e) =
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
-  | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
+  | SAssign(v, e) -> string_of_sexpr v ^ " = " ^ string_of_sexpr e
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""

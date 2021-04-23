@@ -5,6 +5,7 @@ def void printSquares(int x) {
 	int i;
 	int j;
 	matrix int [3][5] m;
+	matrix int [3][5] test;
 	s = x * x;
 	m = [[1,2,3,4,5],
 	     [8,7,6,2,10],
@@ -14,7 +15,14 @@ def void printSquares(int x) {
 	printStr("All Values of matrix:");
 	for(j = 0; j < m.row; j = j + 1 ){
 		for(i = 0; i < m.col; i = i + 1){
+			test[j][i] = m[j][i] * 2;
 			print(m[j][i]);
+		}
+	}
+	printStr("Values of Matrix *2");
+	for(j = 0; j < m.row; j = j + 1 ){
+		for(i = 0; i < m.col; i = i + 1){
+			print(test[j][i]);
 		}
 	}
 	

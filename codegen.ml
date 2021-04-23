@@ -148,8 +148,13 @@ let translate (globals, functions) =
       | SRow (r)   -> L.const_int i32_t r
       | SAccess (s,r,c) -> let a = expr builder r and b = expr builder c in
                           (accessValue s a b builder false)
-      | SAssign (s, e) -> let e' = expr builder e in
-                          ignore(L.build_store e' (lookup s) builder); e'
+      | SAssign (s, e) -> let e' = expr builder e and
+                          s' = (match s with
+                            (_, SAccess(t,r,c)) -> let a = expr builder r and b = expr builder c in
+                              accessValue t a b builder true
+                          | (_,SId(t)) -> lookup t
+                          | _      -> raise(Failure "Value is not assignable")) in
+                          ignore(L.build_store e' s' builder); e'
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
