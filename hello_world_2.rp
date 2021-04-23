@@ -6,6 +6,7 @@ def void printSquares(int x) {
 	int j;
 	matrix int [3][5] m;
 	matrix int [3][5] test;
+	matrix int [3][5] after;
 	s = x * x;
 	m = [[1,2,3,4,5],
 	     [8,7,6,2,10],
@@ -25,7 +26,16 @@ def void printSquares(int x) {
 			print(test[j][i]);
 		}
 	}
-	
+
+	after = test-m;
+	after = after-m;
+	printStr("Values of test - m twice");
+	for(j = 0; j < m.row; j = j + 1 ){
+		for(i = 0; i < m.col; i = i + 1){
+			print(after[j][i]);
+		}
+	}
+
 }
 
 def void main() {

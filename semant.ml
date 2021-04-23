@@ -119,18 +119,29 @@ let check (globals, functions) =
           and (t2, e2') = expr e2 in
           (* All binary operators require operands of the same type *)
           let same = t1 = t2 in
+          let error = "illegal binary operator " ^
+          string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+          string_of_typ t2 ^ " in " ^ string_of_expr e in 
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
             Add | Sub | Mult | Div when same && t1 = Int   -> Int
           | Add | Sub | Mult | Div when same && t1 = Float -> Float
+          | Add | Sub -> (match t1, t2 with 
+                Matrix(s1,a1,b1), Matrix(s2,a2,b2) ->
+                  if s1=s2 && a1 = a2 && b1 = b2 then Matrix(s1,a1,b1)
+                  else raise (Failure "illegal binary operator for
+                  matrix of different sizes")
+                   | _ -> raise (Failure error))
+          | Mult  -> (match t1, t2 with 
+                Matrix(s1,a1,b1), Matrix(s2,a2,b2) ->
+                  if s1=s2 && b1 = a2 then Matrix(s1,a1,b1)
+                  else raise (Failure "illegal dimensions for matrix mult")
+                  | _ -> raise (Failure error))
           | Equal | Neq            when same               -> Bool
           | Less | Leq | Greater | Geq
                      when same && (t1 = Int || t1 = Float) -> Bool
           | And | Or when same && t1 = Bool -> Bool
-          | _ -> raise (
-	      Failure ("illegal binary operator " ^
-                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-                       string_of_typ t2 ^ " in " ^ string_of_expr e))
+          | _ -> raise (Failure error)
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in

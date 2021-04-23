@@ -17,11 +17,9 @@ Amina Assal, Ivan Barral, Rafail Khalilov, and Myric Lehner
 //building
 make redpandas.native
 
+
 //compiling test case
-./redpandas.native hello_world_2.rp > hello_world_2.ll
-llc -relocation-model=pic hello_world_2.ll > hello_world_2.s
-cc -o hello_world_2.exe hello_world_2.s printbig.o
-./hello_world_2.exe
+./rpc hello_world_2.rp
 
 // or you can just do the printing thing after building
 ./redpandas.native -a tests/test-gcd.rp

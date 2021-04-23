@@ -78,7 +78,7 @@ let rec string_of_expr = function
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | StrLit(l) -> "\"" ^ (String.escaped l) ^ "\""
-  | Mat(l) -> "matLit"
+  | Mat(_) -> "matLit"
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
@@ -110,7 +110,7 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "String"
-  | Matrix(t, r, c) -> "matrix [" ^ (string_of_int r) ^ "][" ^ string_of_int c ^ "]"
+  | Matrix(_, r, c) -> "matrix [" ^ (string_of_int r) ^ "][" ^ string_of_int c ^ "]"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

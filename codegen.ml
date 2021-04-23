@@ -156,39 +156,77 @@ let translate (globals, functions) =
                           | _      -> raise(Failure "Value is not assignable")) in
                           ignore(L.build_store e' s' builder); e'
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
-	  let e1' = expr builder e1
-	  and e2' = expr builder e2 in
-	  (match op with 
-	    A.Add     -> L.build_fadd
-	  | A.Sub     -> L.build_fsub
-	  | A.Mult    -> L.build_fmul
-	  | A.Div     -> L.build_fdiv 
-	  | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
-	  | A.Neq     -> L.build_fcmp L.Fcmp.One
-	  | A.Less    -> L.build_fcmp L.Fcmp.Olt
-	  | A.Leq     -> L.build_fcmp L.Fcmp.Ole
-	  | A.Greater -> L.build_fcmp L.Fcmp.Ogt
-	  | A.Geq     -> L.build_fcmp L.Fcmp.Oge
-	  | A.And | A.Or ->
-	      raise (Failure "internal error: semant should have rejected and/or on float")
-	  ) e1' e2' "tmp" builder
+          let e1' = expr builder e1
+          and e2' = expr builder e2 in
+          (match op with 
+            A.Add     -> L.build_fadd
+          | A.Sub     -> L.build_fsub
+          | A.Mult    -> L.build_fmul
+          | A.Div     -> L.build_fdiv 
+          | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+          | A.Neq     -> L.build_fcmp L.Fcmp.One
+          | A.Less    -> L.build_fcmp L.Fcmp.Olt
+          | A.Leq     -> L.build_fcmp L.Fcmp.Ole
+          | A.Greater -> L.build_fcmp L.Fcmp.Ogt
+          | A.Geq     -> L.build_fcmp L.Fcmp.Oge
+          | A.And | A.Or ->
+              raise (Failure "internal error: semant should have rejected and/or on float")
+          ) e1' e2' "tmp" builder
       | SBinop (e1, op, e2) ->
-	  let e1' = expr builder e1
-	  and e2' = expr builder e2 in
-	  (match op with
-	    A.Add     -> L.build_add
-	  | A.Sub     -> L.build_sub
-	  | A.Mult    -> L.build_mul
-          | A.Div     -> L.build_sdiv
-	  | A.And     -> L.build_and
-	  | A.Or      -> L.build_or
-	  | A.Equal   -> L.build_icmp L.Icmp.Eq
-	  | A.Neq     -> L.build_icmp L.Icmp.Ne
-	  | A.Less    -> L.build_icmp L.Icmp.Slt
-	  | A.Leq     -> L.build_icmp L.Icmp.Sle
-	  | A.Greater -> L.build_icmp L.Icmp.Sgt
-	  | A.Geq     -> L.build_icmp L.Icmp.Sge
-	  ) e1' e2' "tmp" builder
+          let e1' = expr builder e1
+          and e2' = expr builder e2
+          and (typ1,e11) = e1
+          and (typ2,e22) = e2  in
+          let str1 = (match e1 with (_, SId(s)) -> s | _ -> "") in
+          let str2 = (match e2 with (_, SId(s)) -> s | _ -> "") in 
+          (match (typ1, typ2) with
+          | (Int, Int)   ->  (match op with
+                                  A.Add     -> L.build_add
+                                | A.Sub     -> L.build_sub
+                                | A.Mult    -> L.build_mul
+                                      | A.Div     -> L.build_sdiv
+                                | A.And     -> L.build_and
+                                | A.Or      -> L.build_or
+                                | A.Equal   -> L.build_icmp L.Icmp.Eq
+                                | A.Neq     -> L.build_icmp L.Icmp.Ne
+                                | A.Less    -> L.build_icmp L.Icmp.Slt
+                                | A.Leq     -> L.build_icmp L.Icmp.Sle
+                                | A.Greater -> L.build_icmp L.Icmp.Sgt
+                                | A.Geq     -> L.build_icmp L.Icmp.Sge) e1' e2' "tmp" builder
+          | (Matrix(Int, a1, b1), Matrix(Int, a2, b2)) ->
+                                (match op with
+                                | A.Add -> 
+                                    let temp = L.build_alloca (array_t (array_t i32_t b2) a1) "tmpmat" builder in
+                                    for i = 0 to (a1-1) do
+                                      for j = 0 to (b2-1) do
+                                        let mat1 = accessValue str1 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                        let mat2 = accessValue str2 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                        let final = L.build_add mat1 mat2 "tmp" builder in
+                                        let l = L.build_gep temp [| L.const_int i32_t 0; L.const_int i32_t i; L.const_int i32_t j |] "tmpmat" builder in
+                                        ignore(L.build_store final l builder);
+                                      done
+                                    done;
+                                    L.build_load (L.build_gep temp [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
+                                  
+                                | A.Sub -> 
+                                  let temp = L.build_alloca (array_t (array_t i32_t b2) a1) "tmpmat" builder in
+                                  for i = 0 to (a1-1) do
+                                    for j = 0 to (b2-1) do
+                                      let mat1 = accessValue str1 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                      let mat2 = accessValue str2 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                      let final = L.build_sub mat1 mat2 "tmp" builder in
+                                      let l = L.build_gep temp [| L.const_int i32_t 0; L.const_int i32_t i; L.const_int i32_t j |] "tmpmat" builder in
+                                      ignore(L.build_store final l builder);
+                                    done
+                                  done;
+                                  L.build_load (L.build_gep temp [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
+                                )                   
+                                
+            )
+          
+          
+          
+           
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder e in
 	  (match op with
