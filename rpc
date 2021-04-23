@@ -1,0 +1,45 @@
+#!/bin/bash
+redpandas="./redpandas.native"
+
+error=0
+globalerror=0
+keep=0
+
+SignalError() {
+    if [ $error -eq 0 ] ; then
+	echo "FAILED"
+	error=1
+    fi
+    echo "  $1"
+}
+
+# Run <args>
+# Report the command, run it, report and exit on any errors
+Run() {
+    echo $* 1>&2
+    eval $* 
+}
+
+Check() {
+    error=0
+    b=`echo $1 | sed 's/.*\\///
+                      s/.rp//'`
+
+
+Run "$redpandas" "$1" ">" "${b}.ll" &&
+    Run "llc" "-relocation-model=pic" "${b}.ll" ">" "${b}.s" &&
+    Run "cc" "-o" "${b}.exe" "${b}.s" "printbig.o" &&
+    Run "rm" "*.ll" "*.s" &&
+    Run "./${b}.exe" 
+   
+}
+
+if [ $# -lt 1 ]
+then
+    echo "Usage: rpc [.rp file]"
+    exit 1
+fi
+
+Check $1
+
+exit $globalerror

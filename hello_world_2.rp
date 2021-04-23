@@ -1,3 +1,5 @@
+/* Hello World on Steroids */
+
 def void printSquares(int x) {
 	int s; 
 	int i;
