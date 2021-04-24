@@ -189,6 +189,10 @@ let check (globals, functions) =
               r -> (Int, SRow(r))
               | _ -> raise(Failure "Add int column value to matrix decl"))
             |_ -> raise(Failure "Cannot find column value of non-matrix"))
+      | Tran(s)    -> 
+          (match type_of_identifier s with
+            Matrix(t,r,c) -> (Matrix(t,c,r), STran(s, Matrix(t,r,c)))
+            |_ -> raise(Failure "Cannot find column value of non-matrix"))
       | Access(s, r, c) -> let (row, row') = expr r in
                       let(col,col') = expr c in
                       if (col = Int)

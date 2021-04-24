@@ -146,6 +146,21 @@ let translate (globals, functions) =
             L.const_array (array_t innertype (List.length (List.hd mat))) list2array
       | SCol (c)   -> L.const_int i32_t c
       | SRow (r)   -> L.const_int i32_t r
+      | STran (s,t)  -> 
+                    let typ = match t with 
+                    Matrix(Int, c, r) -> i32_t | Matrix(Float, c, r) -> float_t| _ -> i32_t in
+                    (match t with
+                    Matrix(Int, c, r) | Matrix(Float, c, r) ->
+                        let tempAlloc = L.build_alloca (array_t (array_t typ c) r) "tmpmat" builder in
+                        for i=0 to (c-1) do
+                            for j=0 to (r-1) do
+                                let temp = accessValue s (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                let l = L.build_gep tempAlloc [| L.const_int i32_t 0; L.const_int i32_t j; L.const_int i32_t i |] "tmpmat" builder in
+                                ignore(L.build_store temp l builder);
+                            done
+                        done;
+                        L.build_load (L.build_gep tempAlloc [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
+                    | _ -> L.const_int i32_t 0)
       | SAccess (s,r,c) -> let a = expr builder r and b = expr builder c in
                           (accessValue s a b builder false)
       | SAssign (s, e) -> let e' = expr builder e and

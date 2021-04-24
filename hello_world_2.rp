@@ -7,14 +7,13 @@ def void printSquares(int x) {
 	matrix int [3][5] m;
 	matrix int [3][5] test;
 	matrix int [3][5] after;
-	matrix int [1][2] vector1;
-	matrix int [2][1] vector2;
-	matrix int [1][1] vectorRes;
+	matrix int [2][1] vector1;
+	matrix int [1][2] vector2;
+	matrix int [2][2] vectorRes;
 	matrix int [2][2] vector3;
 	matrix int [2][2] vector4;
 	matrix int [2][2] vectorRes2;
-	vector1 = [[1,2]];
-	vector2 = [[4],[12]];
+	vector1 = [[3],[4]];
 	vector3 = [[3,4],
 	           [6,4]];
 	vector4 = [[3,2],
@@ -49,6 +48,7 @@ def void printSquares(int x) {
 			print(after[j][i]);
 		}
 	}
+	vector2 = vector1.T;
 	vectorRes = vector1*vector2;
 	printStr("Values of matrix multiplication");
 	for(j = 0; j < vectorRes.row; j = j + 1 ){

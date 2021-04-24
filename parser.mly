@@ -25,6 +25,7 @@ let parse_error s =
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE 
 %token STRING MATRIX INT BOOL FLOAT VOID
+%token TRANSP
 %token COL ROW
 %token DEF
 %token <int> LITERAL
@@ -129,12 +130,13 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3)   }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
-  | expr ASSIGN expr   { Assign($1, $3)         }
+  | expr ASSIGN expr   { Assign($1, $3)       }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN        { $2            }
   | LBRACK mat_opt RBRACK     { Mat($2)       }
   | ID PERIOD COL             { Col($1)       }
   | ID PERIOD ROW             { Row($1)       }
+  | ID PERIOD TRANSP          { Tran($1)      }
   | ID LBRACK expr RBRACK LBRACK expr RBRACK
                       { Access($1, $3, $6)    }
                       

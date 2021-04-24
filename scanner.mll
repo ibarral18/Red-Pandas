@@ -24,6 +24,7 @@ rule token = parse
 | '/'      { DIVIDE }
 | ".*"     { ELTIMES }
 | "./"     { ELDIVIDE }
+| "T"      { TRANSP }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }

@@ -16,6 +16,7 @@ and sx =
   | SMat of typ * sexpr list list 
   | SCol of int
   | SRow of int
+  | STran of string * typ
   | SAccess of string * sexpr * sexpr
   | SNoexpr
   
