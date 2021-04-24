@@ -126,7 +126,7 @@ let check (globals, functions) =
           let ty = match op with
             Add | Sub | Mult | Div when same && t1 = Int   -> Int
           | Add | Sub | Mult | Div when same && t1 = Float -> Float
-          | Add | Sub -> (match t1, t2 with 
+          | Add | Sub | Elmult| Eldiv -> (match t1, t2 with 
                 Matrix(s1,a1,b1), Matrix(s2,a2,b2) ->
                   if s1=s2 && a1 = a2 && b1 = b2 then Matrix(s1,a1,b1)
                   else raise (Failure "illegal binary operator for

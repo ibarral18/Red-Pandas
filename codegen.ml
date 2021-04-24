@@ -221,6 +221,31 @@ let translate (globals, functions) =
                                   done;
                                   L.build_load (L.build_gep temp [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
                                 
+                                | A.Elmult -> 
+                                  let temp = L.build_alloca (array_t (array_t i32_t b2) a1) "tmpmat" builder in
+                                  for i = 0 to (a1-1) do
+                                    for j = 0 to (b2-1) do
+                                      let mat1 = accessValue str1 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                      let mat2 = accessValue str2 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                      let final = L.build_mul mat1 mat2 "tmp" builder in
+                                      let l = L.build_gep temp [| L.const_int i32_t 0; L.const_int i32_t i; L.const_int i32_t j |] "tmpmat" builder in
+                                      ignore(L.build_store final l builder);
+                                    done
+                                  done;
+                                  L.build_load (L.build_gep temp [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
+                                | A.Eldiv -> 
+                                  let temp = L.build_alloca (array_t (array_t i32_t b2) a1) "tmpmat" builder in
+                                  for i = 0 to (a1-1) do
+                                    for j = 0 to (b2-1) do
+                                      let mat1 = accessValue str1 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                      let mat2 = accessValue str2 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                      let final = L.build_sdiv mat1 mat2 "tmp" builder in
+                                      let l = L.build_gep temp [| L.const_int i32_t 0; L.const_int i32_t i; L.const_int i32_t j |] "tmpmat" builder in
+                                      ignore(L.build_store final l builder);
+                                    done
+                                  done;
+                                  L.build_load (L.build_gep temp [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
+                                  
                                 | A.Mult ->
                                   let temp = L.build_alloca (array_t (array_t i32_t b2) a1) "tmpmat" builder in
                                   let temp_val = L.build_alloca i32_t "tmpval" builder in
@@ -266,8 +291,32 @@ let translate (globals, functions) =
                                         ignore(L.build_store final l builder);
                                       done
                                     done;
+                                  L.build_load (L.build_gep temp [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
+                                  | A.Elmult -> 
+                                    let temp = L.build_alloca (array_t (array_t float_t b2) a1) "tmpmat" builder in
+                                    for i = 0 to (a1-1) do
+                                      for j = 0 to (b2-1) do
+                                        let mat1 = accessValue str1 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                        let mat2 = accessValue str2 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                        let final = L.build_fmul mat1 mat2 "tmp" builder in
+                                        let l = L.build_gep temp [| L.const_int i32_t 0; L.const_int i32_t i; L.const_int i32_t j |] "tmpmat" builder in
+                                        ignore(L.build_store final l builder);
+                                      done
+                                    done;
                                     L.build_load (L.build_gep temp [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
                                   
+                                | A.Eldiv -> 
+                                  let temp = L.build_alloca (array_t (array_t float_t b2) a1) "tmpmat" builder in
+                                  for i = 0 to (a1-1) do
+                                    for j = 0 to (b2-1) do
+                                      let mat1 = accessValue str1 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                      let mat2 = accessValue str2 (L.const_int i32_t i) (L.const_int i32_t j) builder false in
+                                      let final = L.build_fdiv mat1 mat2 "tmp" builder in
+                                      let l = L.build_gep temp [| L.const_int i32_t 0; L.const_int i32_t i; L.const_int i32_t j |] "tmpmat" builder in
+                                      ignore(L.build_store final l builder);
+                                    done
+                                  done;
+                                  L.build_load (L.build_gep temp [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
                                   | A.Mult ->
                                     let temp = L.build_alloca (array_t (array_t i32_t b2) a1) "tmpmat" builder in
                                     let temp_val = L.build_alloca float_t "tmpval" builder in

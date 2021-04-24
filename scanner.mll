@@ -22,6 +22,8 @@ rule token = parse
 | '-'      { MINUS }
 | '*'      { TIMES }
 | '/'      { DIVIDE }
+| ".*"     { ELTIMES }
+| "./"     { ELDIVIDE }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }

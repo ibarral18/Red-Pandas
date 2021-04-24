@@ -10,8 +10,16 @@ def void printSquares(int x) {
 	matrix int [1][2] vector1;
 	matrix int [2][1] vector2;
 	matrix int [1][1] vectorRes;
+	matrix int [2][2] vector3;
+	matrix int [2][2] vector4;
+	matrix int [2][2] vectorRes2;
 	vector1 = [[1,2]];
 	vector2 = [[4],[12]];
+	vector3 = [[3,4],
+	           [6,4]];
+	vector4 = [[3,2],
+						 [1,1]];
+	
 
 	s = x * x;
 	m = [[1,2,3,4,5],
@@ -41,11 +49,18 @@ def void printSquares(int x) {
 			print(after[j][i]);
 		}
 	}
-	vectorRes = (vector1*vector2);
+	vectorRes = vector1*vector2;
 	printStr("Values of matrix multiplication");
 	for(j = 0; j < vectorRes.row; j = j + 1 ){
 		for(i = 0; i < vectorRes.col; i = i + 1){
 			print(vectorRes[j][i]);
+		}
+	}
+	vectorRes2 = vector3 ./ vector4;
+	printStr("Values of element wise matrix division");
+	for(j = 0; j < vectorRes2.row; j = j + 1 ){
+		for(i = 0; i < vectorRes2.col; i = i + 1){
+			print(vectorRes2[j][i]);
 		}
 	}
 }

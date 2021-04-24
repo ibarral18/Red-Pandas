@@ -21,7 +21,7 @@ let parse_error s =
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA 
 %token LBRACK RBRACK PERIOD
-%token PLUS MINUS TIMES DIVIDE ASSIGN
+%token PLUS MINUS TIMES DIVIDE ELTIMES ELDIVIDE ASSIGN
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE 
 %token STRING MATRIX INT BOOL FLOAT VOID
@@ -44,6 +44,7 @@ let parse_error s =
 %left EQ NEQ
 %left LT GT LEQ GEQ
 %left PLUS MINUS
+%left ELTIMES ELDIVIDE
 %left TIMES DIVIDE
 %right NOT
 
@@ -116,6 +117,8 @@ expr:
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
   | expr TIMES  expr { Binop($1, Mult,  $3)   }
   | expr DIVIDE expr { Binop($1, Div,   $3)   }
+  | expr ELTIMES expr  { Binop($1, Elmult,   $3) }
+  | expr ELDIVIDE expr { Binop($1, Eldiv,   $3)  }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq,   $3)   }
   | expr LT     expr { Binop($1, Less,  $3)   }
