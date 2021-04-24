@@ -134,7 +134,7 @@ let check (globals, functions) =
                    | _ -> raise (Failure error))
           | Mult  -> (match t1, t2 with 
                 Matrix(s1,a1,b1), Matrix(s2,a2,b2) ->
-                  if s1=s2 && b1 = a2 then Matrix(s1,a1,b1)
+                  if s1=s2 && b1 = a2 then Matrix(s1,a1,b2)
                   else raise (Failure "illegal dimensions for matrix mult")
                   | _ -> raise (Failure error))
           | Equal | Neq            when same               -> Bool

@@ -7,6 +7,12 @@ def void printSquares(int x) {
 	matrix int [3][5] m;
 	matrix int [3][5] test;
 	matrix int [3][5] after;
+	matrix int [1][2] vector1;
+	matrix int [2][1] vector2;
+	matrix int [1][1] vectorRes;
+	vector1 = [[1,2]];
+	vector2 = [[4],[12]];
+
 	s = x * x;
 	m = [[1,2,3,4,5],
 	     [8,7,6,2,10],
@@ -35,7 +41,13 @@ def void printSquares(int x) {
 			print(after[j][i]);
 		}
 	}
-
+	vectorRes = (vector1*vector2);
+	printStr("Values of matrix multiplication");
+	for(j = 0; j < vectorRes.row; j = j + 1 ){
+		for(i = 0; i < vectorRes.col; i = i + 1){
+			print(vectorRes[j][i]);
+		}
+	}
 }
 
 def void main() {
