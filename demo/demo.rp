@@ -40,6 +40,6 @@ def void main() {
 	for(j = 0; j < identity.row; j = j + 1 ){
 		for(i = 0; i < identity.col; i = i + 1){
 			print(identity[j][i]);
-		} i
+		}
 	}
 }
