@@ -355,7 +355,20 @@ let translate (globals, functions) =
                                     L.build_load (L.build_gep temp [| L.const_int i32_t 0 |] "tmpmat" builder) "tmpmat" builder
                                   | _ ->  raise (Failure "error: not a viable matrix to matrix operation")    
                                     )      
-          | _ -> raise (Failure "error: not a viable binary operation")                  
+          | _ -> (match op with
+                      A.Add     -> L.build_add
+                    | A.Sub     -> L.build_sub
+                    | A.Mult    -> L.build_mul
+                          | A.Div     -> L.build_sdiv
+                    | A.And     -> L.build_and
+                    | A.Or      -> L.build_or
+                    | A.Equal   -> L.build_icmp L.Icmp.Eq
+                    | A.Neq     -> L.build_icmp L.Icmp.Ne
+                    | A.Less    -> L.build_icmp L.Icmp.Slt
+                    | A.Leq     -> L.build_icmp L.Icmp.Sle
+                    | A.Greater -> L.build_icmp L.Icmp.Sgt
+                    | A.Geq     -> L.build_icmp L.Icmp.Sge
+                    | _ ->  raise (Failure "error: not a viable operation")    ) e1' e2' "tmp" builder                 
         )
           
           
