@@ -38,16 +38,18 @@ def void main() {
 
 
     if(det1 == det2){
-	    printStr("Determinants are equal");
+	    printStr("Determinants are equal:");
         print(det1);
-        printStr("=");
-        print(det2);
+ 
     }
+
+    printStr("");
 
     printStr("Identity:");
 	for(j = 0; j < identity.row; j = j + 1 ){
 		for(i = 0; i < identity.col; i = i + 1){
 			print(identity[j][i]);
 		} 
+        printStr("");
 	}
 }
