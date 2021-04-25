@@ -48,10 +48,12 @@ let rec string_of_sexpr (t, e) =
   | SBoolLit(false) -> "false"
   | SStrLit(l) -> "\"" ^ (String.escaped l) ^ "\""
   | SFliteral(l) -> l
-  | SMat(l,s) -> "matLit"
+  | SMat(_,_) -> "matLit"
   | SId(s) -> s
   | SCol(s) -> (string_of_int s) ^ " columns"
   | SRow(s) -> (string_of_int s) ^ " rows"
+  | STran (s,b) -> string_of_typ b ^ " " ^ s ^ ".T"    
+  | SAccess (s,e1,e2) -> s ^ "[" ^ string_of_sexpr e1 ^ "]" ^ "[" ^ string_of_sexpr e2 ^ "]"
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
@@ -59,7 +61,8 @@ let rec string_of_sexpr (t, e) =
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""
-				  ) ^ ")"				     
+				  ) ^ ")"			
+  
 
 let rec string_of_sstmt = function
     SBlock(stmts) ->

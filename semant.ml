@@ -129,8 +129,7 @@ let check (globals, functions) =
           | Add | Sub | Elmult| Eldiv -> (match t1, t2 with 
                 Matrix(s1,a1,b1), Matrix(s2,a2,b2) ->
                   if s1=s2 && a1 = a2 && b1 = b2 then Matrix(s1,a1,b1)
-                  else raise (Failure "illegal binary operator for
-                  matrix of different sizes")
+                  else raise (Failure "illegal binary operator for matrix of different sizes")
                    | _ -> raise (Failure error))
           | Mult  -> (match t1, t2 with 
                 Matrix(s1,a1,b1), Matrix(s2,a2,b2) ->
@@ -165,7 +164,7 @@ let check (globals, functions) =
           if not (List.for_all (fun l -> if List.hd(row_lengths) = l then true else false) row_lengths) then
             raise (Failure ("Matrix rows must be of same length"))
           else 
-            let (wt, w') = expr (List.hd(List.hd(arr))) in
+            let (wt, _) = expr (List.hd(List.hd(arr))) in
             let r = List.length arr in 
             let c = List.length (List.hd arr) in
             let expr_check = function 
@@ -201,7 +200,7 @@ let check (globals, functions) =
                                 else raise(Failure "row value is non-integer");)
                         else raise(Failure "column value is non-integer");
                       (match type_of_identifier s with
-                      Matrix(t,a,b) -> (t, SAccess(s, (row, row'), (col,col')))
+                      Matrix(t,_,_) -> (t, SAccess(s, (row, row'), (col,col')))
                       | _ -> raise(Failure "Cannot perform access operation on a non-matrix type")
                       )
 

@@ -1,6 +1,6 @@
 /* Hello World on Steroids */
 
-def void printSquares(int x) {
+def matrix int [2][2] printSquares(int x, matrix int [2][2] p) {
 	int s; 
 	int i;
 	int j;
@@ -19,13 +19,14 @@ def void printSquares(int x) {
 	vector4 = [[3,2],
 						 [1,1]];
 	
-
 	s = x * x;
 	m = [[1,2,3,4,5],
 	     [8,7,6,2,10],
 			 [20,10,4,9,1]];
 	printStr("Square of x is: ");
 	print(s);
+	printStr("VALUE OF P");
+	print(p[0][0]);
 	printStr("All Values of matrix:");
 	for(j = 0; j < m.row; j = j + 1 ){
 		for(i = 0; i < m.col; i = i + 1){
@@ -63,9 +64,14 @@ def void printSquares(int x) {
 			print(vectorRes2[j][i]);
 		}
 	}
+	return vector3;
 }
 
 def void main() {
-	printSquares(3);
+	matrix int [2][2] m;
+	m = [[1,1],
+      [0,2]];
+	m = printSquares(3, m);
+	print(m[0][0]);
 }
 
