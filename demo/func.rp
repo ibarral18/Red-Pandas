@@ -1,0 +1,30 @@
+
+def void printThreeBy(matrix int [3][3] m) {
+    int i;
+    int j;
+
+    for(i = 0; i < m.row; i = i + 1) {
+        for(j = 0; j < m.col; j = j + 1) {
+            print(m[i][j]);
+        }
+        printStr("");
+    }
+}
+
+def void main() {
+
+    matrix int [3][3] mat;
+    matrix int [3][3] alt;
+
+    mat = [[1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]];
+
+    printThreeBy(mat);
+
+    printStr("And now a math test:");
+
+    alt = mat.T;
+
+    printThreeBy(mat * alt);
+}

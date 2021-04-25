@@ -1,0 +1,37 @@
+
+
+def void main() {
+
+    int s;
+    int i;
+    int j;
+    matrix int [4][4] m;
+
+    s = 5;
+
+    m = [[1,2,3,4],
+        [5,6,7,8],
+        [9,10,11,12],
+        [13,14,15,16]];
+
+    printStr("");
+    printStr("s = ");
+    print(s);
+    printStr("");
+    printStr("");
+
+    printStr("s squared = ");
+    print(s * s);
+    printStr("");
+    printStr("");
+    printStr("m is a 4x4. m squared: ");
+
+    m = m * m;
+
+    for(i = 0; i < m.row; i = i + 1) {
+        for(j = 0; j < m.col; j = j + 1) {
+            print(m[i][j]);
+        }
+        printStr("");
+    }
+}
