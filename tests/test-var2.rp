@@ -1,4 +1,4 @@
-def int a;
+int a;
 
 def void foo(int c)
 {
