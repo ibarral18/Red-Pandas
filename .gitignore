@@ -3,3 +3,15 @@
 .*~
 *~
 *.*~
+*.exe
+*.o
+*.s
+*.a
+*.cmi
+*.where
+*.depends
+*.cmo
+*.cmx
+*.*.depends
+*.log
+*.native
