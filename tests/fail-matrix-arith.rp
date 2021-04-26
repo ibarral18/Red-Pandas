@@ -1,0 +1,28 @@
+def int main()
+{
+    int i;
+    int j;
+    matrix int [3][3] x;
+    matrix int [3][3] y;
+    matrix int [3][3] total;
+
+
+	x = [[1,2,3],
+         [4,5,6],
+         [7,8,9]];
+
+    y = [[9,8,7],
+         [6,5,4],
+         [3,2,1]];
+
+    total = x + y * x;
+
+    for(j = 0; j < total.row; j = j + 1 ){
+		for(i = 0; i < total.col; i = i + 1){
+			print(total[j][i]);
+		} 
+        printStr("");
+	}
+    
+  return 0;
+}

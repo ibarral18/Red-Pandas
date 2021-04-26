@@ -31,6 +31,7 @@ clean :
 .PHONY : smallclean
 smallclean :
 	rm -rf testall.log *.diff *.err *.ll
+	rm *.exe *.s *.out
 
 # Testing the "printbig" example
 
