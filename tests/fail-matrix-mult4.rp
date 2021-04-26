@@ -1,0 +1,40 @@
+def matrix int [3][3] mult(matrix int [3][3] x, matrix int [3][3] y, matrix int [3][3] z)
+{
+  return x * y * z;
+}
+
+def int main()
+{
+    int i;
+    int j;
+    matrix int [3][3] x;
+    matrix int [3][3] y;
+    matrix int [3][3] z;
+    matrix int [3][3] prod;
+
+    
+
+	x = [[1,2,3],
+         [4,5,6],
+         [7,8,9]];
+
+    y = [[9,8,7],
+         [6,5,4],
+         [3,2,1]];
+
+    z = [[2,2,2],
+         [2,2,2],
+         [2,2,2]];
+
+    prod = mult(x,y,z);
+
+    for(j = 0; j < prod.row; j = j + 1 ){
+		for(i = 0; i < prod.col; i = i + 1){
+			print(prod[j][i]);
+		} 
+        printStr("");
+	}
+
+    
+  return 0;
+}
