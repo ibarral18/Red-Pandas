@@ -1,0 +1,23 @@
+def int main()
+{
+    int i;
+    int j;
+    matrix int [3][4] x;
+    matrix int [4][3] y;
+
+    x = [[1,2,3,4],
+         [5,6,7,8],
+         [9,10,11,12]];
+
+    y = x.T;
+
+    for(j = 0; j < y.row; j = j + 1 ){
+		for(i = 0; i < y.col; i = i + 1){
+			print(y[j][i]);
+		} 
+        printStr("");
+	}
+
+    
+  return 0;
+}

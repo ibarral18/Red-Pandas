@@ -100,11 +100,11 @@ let check (globals, functions) =
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex -> 
-          let lt = type_of_identifier var
+          let (lt, var') = expr var
           and (rt, e') = expr e in
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
-          in (check_assign lt rt err, SAssign(var, (rt, e')))
+          in (check_assign lt rt err, SAssign((lt, var'), (rt, e')))
       | Unop(op, e) as ex -> 
           let (t, e') = expr e in
           let ty = match op with
@@ -119,18 +119,28 @@ let check (globals, functions) =
           and (t2, e2') = expr e2 in
           (* All binary operators require operands of the same type *)
           let same = t1 = t2 in
+          let error = "illegal binary operator " ^
+          string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+          string_of_typ t2 ^ " in " ^ string_of_expr e in 
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
             Add | Sub | Mult | Div when same && t1 = Int   -> Int
           | Add | Sub | Mult | Div when same && t1 = Float -> Float
+          | Add | Sub | Elmult| Eldiv -> (match t1, t2 with 
+                Matrix(s1,a1,b1), Matrix(s2,a2,b2) ->
+                  if s1=s2 && a1 = a2 && b1 = b2 then Matrix(s1,a1,b1)
+                  else raise (Failure "illegal binary operator for matrix of different sizes")
+                   | _ -> raise (Failure error))
+          | Mult  -> (match t1, t2 with 
+                Matrix(s1,a1,b1), Matrix(s2,a2,b2) ->
+                  if s1=s2 && b1 = a2 then Matrix(s1,a1,b2)
+                  else raise (Failure "illegal dimensions for matrix mult")
+                  | _ -> raise (Failure error))
           | Equal | Neq            when same               -> Bool
           | Less | Leq | Greater | Geq
                      when same && (t1 = Int || t1 = Float) -> Bool
           | And | Or when same && t1 = Bool -> Bool
-          | _ -> raise (
-	      Failure ("illegal binary operator " ^
-                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-                       string_of_typ t2 ^ " in " ^ string_of_expr e))
+          | _ -> raise (Failure error)
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in
@@ -144,8 +154,60 @@ let check (globals, functions) =
               " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
             in (check_assign ft et err, e')
           in 
-          let args' = List.map2 check_call fd.formals args
+          let formals = List.map (fun (tp, var) -> (tp,var)) fd.formals in
+          let args' = List.map2 check_call formals args
           in (fd.typ, SCall(fname, args'))
+      
+      | Mat(arr) ->
+        let sArr = (List.map (fun l -> (List.map expr l)) arr) in
+          let row_lengths = List.map List.length arr in 
+          if not (List.for_all (fun l -> if List.hd(row_lengths) = l then true else false) row_lengths) then
+            raise (Failure ("Matrix rows must be of same length"))
+          else 
+            let (wt, _) = expr (List.hd(List.hd(arr))) in
+            let r = List.length arr in 
+            let c = List.length (List.hd arr) in
+            let expr_check = function 
+                (Int, _) when wt = Int -> true 
+              | (Float, _) when wt = Float -> true
+              | _ -> raise (Failure("Matrix types don't match")) 
+            in
+            ignore(List.for_all (fun j -> List.for_all (fun k -> expr_check (expr k)) j) arr);
+            (Matrix (wt, r, c), SMat(wt, sArr))
+      | Col(s)     -> 
+          (match type_of_identifier s with
+            Matrix(_,_,c) -> 
+              (match c with 
+              c -> (Int, SCol(c))
+              | _ -> raise(Failure "Add int column value to matrix decl"))
+            |_ -> raise(Failure "Cannot find column value of non-matrix"))
+      | Row(s)     -> 
+          (match type_of_identifier s with
+            Matrix(_,r,_) -> 
+              (match r with 
+              r -> (Int, SRow(r))
+              | _ -> raise(Failure "Add int column value to matrix decl"))
+            |_ -> raise(Failure "Cannot find column value of non-matrix"))
+      | Tran(s)    -> 
+          (match type_of_identifier s with
+            Matrix(t,r,c) -> (Matrix(t,c,r), STran(s, Matrix(t,r,c)))
+            |_ -> raise(Failure "Cannot find column value of non-matrix"))
+      | Access(s, r, c) -> let (row, row') = expr r in
+                      let(col,col') = expr c in
+                      if (col = Int)
+                        then (if(row = Int)
+                                then ()
+                                else raise(Failure "row value is non-integer");)
+                        else raise(Failure "column value is non-integer");
+                      (match type_of_identifier s with
+                      Matrix(t,_,_) -> (t, SAccess(s, (row, row'), (col,col')))
+                      | _ -> raise(Failure "Cannot perform access operation on a non-matrix type")
+                      )
+
+       
+
+
+            
     in
 
     let check_bool_expr e = 

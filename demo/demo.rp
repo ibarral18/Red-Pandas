@@ -1,0 +1,55 @@
+def int calculateDet(matrix int [2][2] m1){
+    int det;
+
+    det = m1[0][0]*m1[1][1] - m1[0][1]*m1[1][0];
+    return det;
+}
+
+def void main() {
+	
+    int det1;
+    int det2;   
+    int j;
+    int i;
+
+    matrix int [2][2] m1;
+    matrix int [2][2] m2;
+
+    matrix int [2][2] m3;
+    matrix int [2][2] m4;
+
+    matrix int [2][2] identity;
+
+	m1 = [[1,2],
+         [3,4]];
+
+    m2 = m1.T;
+
+    m3 = [[2,-1],
+         [-1,1]];
+
+    m4 = [[1,1],
+         [1,2]];
+
+    identity = m3*m4;
+
+    det1 = calculateDet(m1);
+    det2 = calculateDet(m2);
+
+
+    if(det1 == det2){
+	    printStr("Determinants are equal:");
+        print(det1);
+ 
+    }
+
+    printStr("");
+
+    printStr("Identity:");
+	for(j = 0; j < identity.row; j = j + 1 ){
+		for(i = 0; i < identity.col; i = i + 1){
+			print(identity[j][i]);
+		} 
+        printStr("");
+	}
+}

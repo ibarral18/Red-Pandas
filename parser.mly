@@ -2,13 +2,31 @@
 
 %{
 open Ast
+let parse_error s =
+      begin
+        try
+          let start_pos = Parsing.symbol_start_pos ()
+          and end_pos = Parsing.symbol_end_pos () in
+          Printf.printf "File \"%s\", line %d, characters %d-%d: \n"
+            start_pos.pos_fname
+            start_pos.pos_lnum
+            (start_pos.pos_cnum - start_pos.pos_bol)
+            (end_pos.pos_cnum - start_pos.pos_bol)
+        with Invalid_argument(_) -> ()
+      end;
+      Printf.printf "Syntax error: %s\n" s;
+      raise Parsing.Parse_error
+
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA 
-%token PLUS MINUS TIMES DIVIDE ASSIGN
+%token LBRACK RBRACK PERIOD
+%token PLUS MINUS TIMES DIVIDE ELTIMES ELDIVIDE ASSIGN
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE 
-%token STRING INT BOOL FLOAT VOID
+%token STRING MATRIX INT BOOL FLOAT VOID
+%token TRANSP
+%token COL ROW
 %token DEF
 %token <int> LITERAL
 %token <bool> BLIT
@@ -27,6 +45,7 @@ open Ast
 %left EQ NEQ
 %left LT GT LEQ GEQ
 %left PLUS MINUS
+%left ELTIMES ELDIVIDE
 %left TIMES DIVIDE
 %right NOT
 
@@ -57,11 +76,12 @@ formal_list:
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 typ:
-    INT   { Int   }
-  | BOOL  { Bool  }
-  | FLOAT { Float }
-  | VOID  { Void  }
-  | STRING { String }
+    INT        { Int           }
+  | BOOL       { Bool          }
+  | FLOAT      { Float         }
+  | VOID       { Void          }
+  | STRING     { String        }
+  | MATRIX typ LBRACK LITERAL RBRACK LBRACK LITERAL RBRACK   { Matrix($2, $4, $7) }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -98,6 +118,8 @@ expr:
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
   | expr TIMES  expr { Binop($1, Mult,  $3)   }
   | expr DIVIDE expr { Binop($1, Div,   $3)   }
+  | expr ELTIMES expr  { Binop($1, Elmult,   $3) }
+  | expr ELDIVIDE expr { Binop($1, Eldiv,   $3)  }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq,   $3)   }
   | expr LT     expr { Binop($1, Less,  $3)   }
@@ -108,9 +130,30 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3)   }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
-  | ID ASSIGN expr   { Assign($1, $3)         }
+  | expr ASSIGN expr   { Assign($1, $3)       }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
-  | LPAREN expr RPAREN { $2                   }
+  | LPAREN expr RPAREN        { $2            }
+  | LBRACK mat_opt RBRACK     { Mat($2)       }
+  | ID PERIOD COL             { Col($1)       }
+  | ID PERIOD ROW             { Row($1)       }
+  | ID PERIOD TRANSP          { Tran($1)      }
+  | ID LBRACK expr RBRACK LBRACK expr RBRACK
+                      { Access($1, $3, $6)    }
+                      
+
+mat_opt:
+    /* nothing */ { [] }
+  | row_list      { List.rev $1 }
+
+row_list:
+    LBRACK row_expr RBRACK                { [(List.rev $2)]        }
+  | row_list COMMA LBRACK row_expr RBRACK {  (List.rev $4) :: $1 }
+
+row_expr:
+    /* nothing */            { []       }
+  | expr                     { [$1]    }
+  | row_expr COMMA expr      { $3 :: $1 }
+
 
 args_opt:
     /* nothing */ { [] }

@@ -11,9 +11,15 @@ and sx =
   | SId of string
   | SBinop of sexpr * op * sexpr
   | SUnop of uop * sexpr
-  | SAssign of string * sexpr
+  | SAssign of sexpr * sexpr
   | SCall of string * sexpr list
+  | SMat of typ * sexpr list list 
+  | SCol of int
+  | SRow of int
+  | STran of string * typ
+  | SAccess of string * sexpr * sexpr
   | SNoexpr
+  
 
 type sstmt =
     SBlock of sstmt list
@@ -42,15 +48,21 @@ let rec string_of_sexpr (t, e) =
   | SBoolLit(false) -> "false"
   | SStrLit(l) -> "\"" ^ (String.escaped l) ^ "\""
   | SFliteral(l) -> l
+  | SMat(_,_) -> "matLit"
   | SId(s) -> s
+  | SCol(s) -> (string_of_int s) ^ " columns"
+  | SRow(s) -> (string_of_int s) ^ " rows"
+  | STran (s,b) -> string_of_typ b ^ " " ^ s ^ ".T"    
+  | SAccess (s,e1,e2) -> s ^ "[" ^ string_of_sexpr e1 ^ "]" ^ "[" ^ string_of_sexpr e2 ^ "]"
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
-  | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
+  | SAssign(v, e) -> string_of_sexpr v ^ " = " ^ string_of_sexpr e
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""
-				  ) ^ ")"				     
+				  ) ^ ")"			
+  
 
 let rec string_of_sstmt = function
     SBlock(stmts) ->

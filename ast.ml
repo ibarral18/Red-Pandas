@@ -1,13 +1,11 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or
+          And | Or | Elmult | Eldiv
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | Void | String
 
-type bind = typ * string
 
 type expr =
     Literal of int
@@ -17,9 +15,25 @@ type expr =
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
-  | Assign of string * expr
+  | Assign of expr * expr
   | Call of string * expr list
+  | Mat of expr list list 
+  | Col of string
+  | Row of string
+  | Tran of string
+  | Access of string * expr * expr
   | Noexpr
+  
+
+type typ = 
+    Void 
+  | Int 
+  | Bool
+  | Float
+  | String 
+  | Matrix of typ * int * int
+
+type bind = typ * string
 
 type stmt =
     Block of stmt list
@@ -46,6 +60,8 @@ let string_of_op = function
   | Sub -> "-"
   | Mult -> "*"
   | Div -> "/"
+  | Elmult -> ".*"
+  | Eldiv -> "./"
   | Equal -> "=="
   | Neq -> "!="
   | Less -> "<"
@@ -65,13 +81,18 @@ let rec string_of_expr = function
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | StrLit(l) -> "\"" ^ (String.escaped l) ^ "\""
+  | Mat(_) -> "matLit"
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
-  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | Assign(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | Col(s) -> s ^ ".col"
+  | Row(s) -> s ^ ".row"
+  | Tran(s) -> s ^ ".T"
+  | Access(s, r, c) -> s ^ "[" ^ string_of_expr r ^ "]" ^ "[" ^ string_of_expr c ^ "]"
   | Noexpr -> ""
 
 let rec string_of_stmt = function
@@ -93,6 +114,7 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "String"
+  | Matrix(_, r, c) -> "matrix [" ^ (string_of_int r) ^ "][" ^ string_of_int c ^ "]"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

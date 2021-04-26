@@ -28,6 +28,10 @@ clean :
 	ocamlbuild -clean
 	rm -rf testall.log ocamlllvm *.diff *.err *.ll *.s *.exe
 
+.PHONY : smallclean
+smallclean :
+	rm -rf testall.log *.diff *.err *.ll
+
 # Testing the "printbig" example
 
 printbig : printbig.c

@@ -1,4 +1,4 @@
-(* Ocamllex scanner for MicroC *)
+(* Ocamllex scanner for Red-Pandas *)
 
 { open Parser }
 
@@ -10,15 +10,21 @@ rule token = parse
 | "/*"     { comment lexbuf }           (* Comments *)
 | "//"     { line_comment lexbuf}
 | '('      { LPAREN }
+| '.'      { PERIOD }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
+| '['      { LBRACK }
+| ']'      { RBRACK }
 | ';'      { SEMI }
 | ','      { COMMA }
 | '+'      { PLUS }
 | '-'      { MINUS }
 | '*'      { TIMES }
 | '/'      { DIVIDE }
+| ".*"     { ELTIMES }
+| "./"     { ELDIVIDE }
+| "T"      { TRANSP }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }
@@ -39,8 +45,11 @@ rule token = parse
 | "float"  { FLOAT }
 | "void"   { VOID }
 | "String" { STRING }
+| "matrix" { MATRIX }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
+| "col"    { COL }
+| "row"    { ROW }
 | "def"    { DEF }
 | digits as lxm { LITERAL(int_of_string lxm) }
 | digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
