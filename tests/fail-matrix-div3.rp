@@ -1,0 +1,32 @@
+def matrix int [3][3] div(matrix int [3][3] x, matrix int [2][2] y)
+{
+  return x / y;
+}
+
+def int main()
+{
+    int i;
+    int j;
+    matrix int [3][3] x;
+    matrix int [2][2] y;
+    matrix int [3][3] quot;
+
+
+	x = [[1,2,3],
+         [4,5,6],
+         [7,8,9]];
+
+    y = [[9,8],
+         [6,5]];
+
+    quot = div(x,y);
+
+    for(j = 0; j < quot.row; j = j + 1 ){
+		for(i = 0; i < quot.col; i = i + 1){
+			print(quot[j][i]);
+		} 
+        printStr("");
+	}
+    
+  return 0;
+}
