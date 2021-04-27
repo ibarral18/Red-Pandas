@@ -13,7 +13,7 @@ def int main()
 
     
 
-	x = [[1,2,3],
+  	x = [[1,2,3],
          [4,5,6],
          [7,8,9]];
 
@@ -24,11 +24,11 @@ def int main()
     prod = mult(x,y);
 
     for(j = 0; j < prod.row; j = j + 1 ){
-		for(i = 0; i < prod.col; i = i + 1){
-			print(prod[j][i]);
-		} 
+		  for(i = 0; i < prod.col; i = i + 1){
+		  	print(prod[j][i]);
+		  } 
         printStr("");
-	}
+	  } 
 
     
   return 0;

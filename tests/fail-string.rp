@@ -1,0 +1,8 @@
+def void main() {
+
+    String test;
+
+    test = "some words";
+
+    print(test);
+}

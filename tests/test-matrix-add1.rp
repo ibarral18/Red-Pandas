@@ -23,11 +23,11 @@ def int main()
     sum = add(x,y);
 
     for(j = 0; j < sum.row; j = j + 1 ){
-		for(i = 0; i < sum.col; i = i + 1){
-			print(sum[j][i]);
-		} 
-        printStr("");
-	}
+		  for(i = 0; i < sum.col; i = i + 1){
+		  	print(sum[j][i]);
+		  } 
+      printStr("");
+	  }
     
   return 0;
 }

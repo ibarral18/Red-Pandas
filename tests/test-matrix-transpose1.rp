@@ -12,11 +12,11 @@ def int main()
     y = x.T;
 
     for(j = 0; j < y.row; j = j + 1 ){
-		for(i = 0; i < y.col; i = i + 1){
-			print(y[j][i]);
-		} 
-        printStr("");
-	}
+		  for(i = 0; i < y.col; i = i + 1){
+		  	print(y[j][i]);
+		  } 
+      printStr("");
+	  }
 
     
   return 0;

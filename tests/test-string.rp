@@ -1,0 +1,9 @@
+
+def void main() {
+
+    String words;
+
+    words = "Oh no, not again.";
+
+    printStr(words);
+}
